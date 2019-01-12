@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:product_app/pages/product.dart';
 
-class Products extends StatelessWidget {
+class ProductList extends StatelessWidget {
   final List<Map<String, String>> products;
   final Function deleteProduct;
 
-  Products(this.products, this.deleteProduct) {
+  ProductList(this.products, this.deleteProduct) {
     print('[Products Widget] Constructor');
   }
 
