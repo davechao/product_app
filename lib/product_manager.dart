@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:product_app/product_control.dart';
-import 'package:product_app/product_list.dart';
+import 'package:product_app/product_listview.dart';
 
 class ProductManager extends StatefulWidget {
   final Map<String, String> startingProduct;
@@ -57,7 +57,7 @@ class _ProductManagerState extends State<ProductManager> {
           child: ProductControl(_addProduct),
         ),
         Expanded(
-          child: ProductList(_products, _deleteProduct),
+          child: ProductListView(_products, _deleteProduct),
         ),
       ],
     );
