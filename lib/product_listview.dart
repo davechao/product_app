@@ -20,8 +20,10 @@ class ProductListView extends StatelessWidget {
               FlatButton(
                 child: Text('Details'),
                 onPressed: () {
-                  Navigator.pushNamed<bool>(context, '/product/' + index.toString())
-                      .then((bool value) {
+                  Navigator.pushNamed<bool>(
+                    context,
+                    '/product/' + index.toString(),
+                  ).then((bool value) {
                     if (value) {
                       deleteProduct(index);
                     }
