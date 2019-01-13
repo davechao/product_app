@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:product_app/pages/products_admin.dart';
 import 'package:product_app/product_manager.dart';
 
 class Products extends StatelessWidget {
@@ -14,7 +15,14 @@ class Products extends StatelessWidget {
             ),
             ListTile(
               title: Text('Manage Products'),
-              onTap: () {},
+              onTap: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => ProductsAdmin()
+                  ),
+                );
+              },
             ),
           ],
         ),
