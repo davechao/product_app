@@ -15,12 +15,13 @@ class MyApp extends StatefulWidget {
 }
 
 class _MyAppState extends State<MyApp> {
-  List<Map<String, String>> _products = [];
+  List<Map<String, dynamic>> _products = [];
 
-  void _addProduct(Map<String, String> product) {
+  void _addProduct(Map<String, dynamic> product) {
     setState(() {
       _products.add(product);
     });
+    print(_products);
   }
 
   void _deleteProduct(int index) {
@@ -40,8 +41,8 @@ class _MyAppState extends State<MyApp> {
       ),
 //      home: Auth(),
       routes: {
-        '/': (context) => Products(_products, _addProduct, _deleteProduct),
-        '/admin': (context) => ProductsAdmin(),
+        '/': (context) => Products(_products),
+        '/admin': (context) => ProductsAdmin(_addProduct, _deleteProduct),
       },
       onGenerateRoute: (RouteSettings settings) {
         final List<String> pathElements = settings.name.split('/');
@@ -59,8 +60,7 @@ class _MyAppState extends State<MyApp> {
       },
       onUnknownRoute: (RouteSettings settings) {
         return MaterialPageRoute(
-          builder: (context) =>
-              Products(_products, _addProduct, _deleteProduct),
+          builder: (context) => Products(_products),
         );
       },
     );
