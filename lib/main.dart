@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:product_app/pages/auth.dart';
 import 'package:product_app/pages/product.dart';
 import 'package:product_app/pages/products.dart';
 import 'package:product_app/pages/products_admin.dart';
@@ -37,11 +38,11 @@ class _MyAppState extends State<MyApp> {
       theme: ThemeData(
         brightness: Brightness.light,
         primarySwatch: Colors.deepOrange,
-        accentColor: Colors.purple,
+        accentColor: Colors.deepOrangeAccent,
       ),
-//      home: Auth(),
       routes: {
-        '/': (context) => Products(_products),
+        '/': (context) => Auth(),
+        '/products': (context) => Products(_products),
         '/admin': (context) => ProductsAdmin(_addProduct, _deleteProduct),
       },
       onGenerateRoute: (RouteSettings settings) {
