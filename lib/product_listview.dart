@@ -31,7 +31,7 @@ class ProductListView extends StatelessWidget {
                 Container(
                   padding: EdgeInsets.symmetric(horizontal: 6.0, vertical: 2.5),
                   decoration: BoxDecoration(
-                    color: Theme.of(context).accentColor,
+                    color: Colors.deepPurpleAccent,
                     borderRadius: BorderRadius.circular(5.0),
                   ),
                   child: Text(
@@ -56,8 +56,19 @@ class ProductListView extends StatelessWidget {
           ButtonBar(
             alignment: MainAxisAlignment.center,
             children: <Widget>[
-              FlatButton(
-                child: Text('Details'),
+              IconButton(
+                icon: Icon(Icons.info),
+                color: Colors.blue,
+                onPressed: () {
+                  Navigator.pushNamed<bool>(
+                    context,
+                    '/product/' + index.toString(),
+                  );
+                },
+              ),
+              IconButton(
+                icon: Icon(Icons.favorite_border),
+                color: Colors.red,
                 onPressed: () {
                   Navigator.pushNamed<bool>(
                     context,
