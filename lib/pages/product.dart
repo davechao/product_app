@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:product_app/widgets/ui_elements/title_default.dart';
 
 class Product extends StatelessWidget {
   final String title;
@@ -7,6 +8,35 @@ class Product extends StatelessWidget {
   final String description;
 
   Product(this.title, this.imageUrl, this.price, this.description);
+
+  Widget _buildAddressPriceRow() {
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.center,
+      children: <Widget>[
+        Text(
+          'Union Square, Sun Francisco',
+          style: TextStyle(
+            fontFamily: 'Oswald',
+            color: Colors.grey,
+          ),
+        ),
+        Container(
+          margin: EdgeInsets.symmetric(horizontal: 5.0),
+          child: Text(
+            '|',
+            style: TextStyle(color: Colors.grey),
+          ),
+        ),
+        Text(
+          '\$${price.toString()}',
+          style: TextStyle(
+            fontFamily: 'Oswald',
+            color: Colors.grey,
+          ),
+        ),
+      ],
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -26,41 +56,9 @@ class Product extends StatelessWidget {
             Image.asset(imageUrl),
             Container(
               padding: EdgeInsets.all(10.0),
-              child: Text(
-                title,
-                style: TextStyle(
-                  fontSize: 26.0,
-                  fontFamily: 'Oswald',
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
+              child: TitleDefault(title),
             ),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: <Widget>[
-                Text(
-                  'Union Square, Sun Francisco',
-                  style: TextStyle(
-                    fontFamily: 'Oswald',
-                    color: Colors.grey,
-                  ),
-                ),
-                Container(
-                  margin: EdgeInsets.symmetric(horizontal: 5.0),
-                  child: Text(
-                    '|',
-                    style: TextStyle(color: Colors.grey),
-                  ),
-                ),
-                Text(
-                  '\$${price.toString()}',
-                  style: TextStyle(
-                    fontFamily: 'Oswald',
-                    color: Colors.grey,
-                  ),
-                ),
-              ],
-            ),
+            _buildAddressPriceRow(),
             Container(
               padding: EdgeInsets.all(10.0),
               child: Text(
