@@ -80,7 +80,7 @@ class _AuthState extends State<Auth> {
   }
 
   _submitForm() {
-    if (!_formKey.currentState.validate()) return;
+    if (!_formKey.currentState.validate() || !_formData['acceptTerms']) return;
     _formKey.currentState.save();
     print(_formData);
     Navigator.pushReplacementNamed(context, '/products');
