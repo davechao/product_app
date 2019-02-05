@@ -50,7 +50,11 @@ class _MyAppState extends State<MyApp> {
         '/': (context) => Auth(),
         '/products': (context) => Products(_products),
         '/admin': (context) => ProductsAdmin(
-            _addProduct, _updateProduct, _deleteProduct, _products),
+              _addProduct,
+              _updateProduct,
+              _deleteProduct,
+              _products,
+            ),
       },
       onGenerateRoute: (RouteSettings settings) {
         final List<String> pathElements = settings.name.split('/');

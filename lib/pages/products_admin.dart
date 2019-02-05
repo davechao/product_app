@@ -9,7 +9,11 @@ class ProductsAdmin extends StatelessWidget {
   final List<Map<String, dynamic>> products;
 
   ProductsAdmin(
-      this.addProduct, this.updateProduct, this.deleteProduct, this.products);
+    this.addProduct,
+    this.updateProduct,
+    this.deleteProduct,
+    this.products,
+  );
 
   Widget _buildSideDrawer(BuildContext context) {
     return Drawer(
@@ -53,7 +57,11 @@ class ProductsAdmin extends StatelessWidget {
         body: TabBarView(
           children: <Widget>[
             ProductEdit(addProduct: addProduct),
-            ProductList(products, updateProduct),
+            ProductList(
+              products,
+              updateProduct,
+              deleteProduct,
+            ),
           ],
         ),
       ),
