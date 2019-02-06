@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:product_app/pages/auth.dart';
-import 'package:product_app/pages/product.dart';
-import 'package:product_app/pages/products.dart';
+import 'package:product_app/pages/produc_detail.dart';
+import 'package:product_app/pages/product_card_list.dart';
 import 'package:product_app/pages/products_admin.dart';
+import 'package:product_app/models/product.dart';
 
 void main() {
   runApp(MyApp());
@@ -16,16 +17,16 @@ class MyApp extends StatefulWidget {
 }
 
 class _MyAppState extends State<MyApp> {
-  List<Map<String, dynamic>> _products = [];
+  List<Product> _products = [];
 
-  void _addProduct(Map<String, dynamic> product) {
+  void _addProduct(Product product) {
     setState(() {
       _products.add(product);
     });
     print(_products);
   }
 
-  void _updateProduct(int index, Map<String, dynamic> product) {
+  void _updateProduct(int index, Product product) {
     setState(() {
       _products[index] = product;
     });
@@ -48,7 +49,7 @@ class _MyAppState extends State<MyApp> {
       ),
       routes: {
         '/': (context) => Auth(),
-        '/products': (context) => Products(_products),
+        '/products': (context) => ProductCardList(_products),
         '/admin': (context) => ProductsAdmin(
               _addProduct,
               _updateProduct,
@@ -64,11 +65,11 @@ class _MyAppState extends State<MyApp> {
         if (pathElements[1] == 'product') {
           final int index = int.parse(pathElements[2]);
           return MaterialPageRoute<bool>(
-            builder: (context) => Product(
-                  _products[index]['title'],
-                  _products[index]['image'],
-                  _products[index]['price'],
-                  _products[index]['description'],
+            builder: (context) => ProductDetail(
+                  _products[index].title,
+                  _products[index].image,
+                  _products[index].price,
+                  _products[index].description,
                 ),
           );
         }
@@ -76,7 +77,7 @@ class _MyAppState extends State<MyApp> {
       },
       onUnknownRoute: (RouteSettings settings) {
         return MaterialPageRoute(
-          builder: (context) => Products(_products),
+          builder: (context) => ProductCardList(_products),
         );
       },
     );

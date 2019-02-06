@@ -1,10 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:product_app/models/product.dart';
 import 'package:product_app/widgets/products/product_listview.dart';
 
-class Products extends StatelessWidget {
-  final List<Map<String, dynamic>> products;
+class ProductCardList extends StatelessWidget {
+  final List<Product> products;
 
-  Products(this.products);
+  ProductCardList(this.products);
 
   Widget _buildSideDrawer(BuildContext context) {
     return Drawer(

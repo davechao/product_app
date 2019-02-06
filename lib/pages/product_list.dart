@@ -1,10 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:product_app/models/product.dart';
 import 'package:product_app/pages/product_edit.dart';
 
 class ProductList extends StatelessWidget {
   final Function updateProduct;
   final Function deleteProduct;
-  final List<Map<String, dynamic>> products;
+  final List<Product> products;
 
   ProductList(
     this.products,
@@ -36,7 +37,7 @@ class ProductList extends StatelessWidget {
     return ListView.builder(
       itemBuilder: (BuildContext context, int index) {
         return Dismissible(
-          key: Key(products[index]['title']),
+          key: Key(products[index].title),
           background: Container(color: Colors.red),
           direction: DismissDirection.endToStart,
           onDismissed: (DismissDirection direction) {
@@ -49,11 +50,11 @@ class ProductList extends StatelessWidget {
               ListTile(
                 leading: CircleAvatar(
                   backgroundImage: AssetImage(
-                    products[index]['image'],
+                    products[index].image,
                   ),
                 ),
-                title: Text(products[index]['title']),
-                subtitle: Text('\$${products[index]['price'].toString()}'),
+                title: Text(products[index].title),
+                subtitle: Text('\$${products[index].price.toString()}'),
                 trailing: _buildEditButton(context, index),
               ),
               Divider(),
