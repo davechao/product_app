@@ -3,7 +3,8 @@ import 'package:product_app/pages/auth.dart';
 import 'package:product_app/pages/product_detail.dart';
 import 'package:product_app/pages/product_card_list.dart';
 import 'package:product_app/pages/products_admin.dart';
-import 'package:product_app/models/product.dart';
+import 'package:product_app/scoped_models/products_model.dart';
+import 'package:scoped_model/scoped_model.dart';
 
 void main() {
   runApp(MyApp());
@@ -17,29 +18,7 @@ class MyApp extends StatefulWidget {
 }
 
 class _MyAppState extends State<MyApp> {
-  List<Product> _products = [];
-
-  void _addProduct(Product product) {
-    setState(() {
-      _products.add(product);
-    });
-    print(_products);
-  }
-
-  void _updateProduct(int index, Product product) {
-    setState(() {
-      _products[index] = product;
-    });
-  }
-
-  void _deleteProduct(int index) {
-    setState(() {
-      _products.removeAt(index);
-    });
-  }
-
-  @override
-  Widget build(BuildContext context) {
+  Widget _buildMaterialApp() {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
       theme: ThemeData(
@@ -49,13 +28,8 @@ class _MyAppState extends State<MyApp> {
       ),
       routes: {
         '/': (context) => Auth(),
-        '/products': (context) => ProductCardList(_products),
-        '/admin': (context) => ProductsAdmin(
-              _addProduct,
-              _updateProduct,
-              _deleteProduct,
-              _products,
-            ),
+        '/products': (context) => ProductCardList(),
+        '/admin': (context) => ProductsAdmin(),
       },
       onGenerateRoute: (RouteSettings settings) {
         final List<String> pathElements = settings.name.split('/');
@@ -65,21 +39,24 @@ class _MyAppState extends State<MyApp> {
         if (pathElements[1] == 'product') {
           final int index = int.parse(pathElements[2]);
           return MaterialPageRoute<bool>(
-            builder: (context) => ProductDetail(
-                  _products[index].title,
-                  _products[index].image,
-                  _products[index].price,
-                  _products[index].description,
-                ),
+            builder: (context) => ProductDetail(index),
           );
         }
         return null;
       },
       onUnknownRoute: (RouteSettings settings) {
         return MaterialPageRoute(
-          builder: (context) => ProductCardList(_products),
+          builder: (context) => ProductCardList(),
         );
       },
+    );
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return ScopedModel<ProductsModel>(
+      model: ProductsModel(),
+      child: _buildMaterialApp(),
     );
   }
 }
