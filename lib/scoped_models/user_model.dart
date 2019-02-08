@@ -5,6 +5,6 @@ mixin UserModel on Model {
   User _authenticatedUser;
 
   void login(String email, String password) {
-    _authenticatedUser = User(id: 'abcde', email: email, password: password);
+    _authenticatedUser = User(id: 'userId', email: email, password: password);
   }
 }
