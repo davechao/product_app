@@ -1,7 +1,7 @@
 import 'package:product_app/models/product.dart';
 import 'package:scoped_model/scoped_model.dart';
 
-class ProductsModel extends Model {
+mixin ProductModel on Model {
   List<Product> _products = [];
   int _selectedProductIndex;
   bool _showFavorites = false;
@@ -58,8 +58,8 @@ class ProductsModel extends Model {
       isFavorite: newFavoriteStatus,
     );
     _products[_selectedProductIndex] = updateProduct;
-    _selectedProductIndex = null;
     notifyListeners();
+    _selectedProductIndex = null;
   }
 
   void selectProduct(int index) {

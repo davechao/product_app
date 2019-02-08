@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:product_app/scoped_models/products_model.dart';
+import 'package:product_app/scoped_models/main_model.dart';
 import 'package:product_app/widgets/products/product_listview.dart';
 import 'package:scoped_model/scoped_model.dart';
 
@@ -31,8 +31,8 @@ class ProductCardList extends StatelessWidget {
       appBar: AppBar(
         title: Text("Products"),
         actions: <Widget>[
-          ScopedModelDescendant<ProductsModel>(
-            builder: (BuildContext context, Widget child, ProductsModel model) {
+          ScopedModelDescendant<MainModel>(
+            builder: (BuildContext context, Widget child, MainModel model) {
               return IconButton(
                 icon: Icon(model.displayFavoritesOnly
                     ? Icons.favorite
