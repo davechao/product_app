@@ -95,6 +95,7 @@ class _ProductEditState extends State<ProductEdit> {
           onPressed: () => _submitForm(
                 model.addProduct,
                 model.updateProduct,
+                model.selectProduct,
                 model.selectedProductIndex,
               ),
         );
@@ -131,30 +132,27 @@ class _ProductEditState extends State<ProductEdit> {
     );
   }
 
-  _submitForm(
-      Function addProduct, Function updateProduct, int selectedProductIndex) {
+  _submitForm(Function addProduct, Function updateProduct,
+      Function selectProduct, int selectedProductIndex) {
     if (!_formKey.currentState.validate()) return;
     _formKey.currentState.save();
     if (selectedProductIndex == null) {
       addProduct(
-        Product(
-          title: _formData['title'],
-          description: _formData['description'],
-          price: _formData['price'],
-          image: _formData['image'],
-        ),
+        _formData['title'],
+        _formData['description'],
+        _formData['image'],
+        _formData['price'],
       );
     } else {
       updateProduct(
-        Product(
-          title: _formData['title'],
-          description: _formData['description'],
-          price: _formData['price'],
-          image: _formData['image'],
-        ),
+        _formData['title'],
+        _formData['description'],
+        _formData['image'],
+        _formData['price'],
       );
     }
-    Navigator.pushReplacementNamed(context, '/products');
+    Navigator.pushReplacementNamed(context, '/products')
+        .then((_) => selectProduct(null));
   }
 
   @override

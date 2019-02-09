@@ -1,11 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:product_app/pages/product_edit.dart';
-import 'package:product_app/scoped_models/product_model.dart';
+import 'package:product_app/scoped_models/main_model.dart';
 import 'package:scoped_model/scoped_model.dart';
 
 class ProductList extends StatelessWidget {
-  Widget _buildEditButton(
-      BuildContext context, int index, ProductModel model) {
+  Widget _buildEditButton(BuildContext context, int index, MainModel model) {
     return IconButton(
       icon: Icon(Icons.edit),
       onPressed: () {
@@ -16,19 +15,21 @@ class ProductList extends StatelessWidget {
               return ProductEdit();
             },
           ),
-        );
+        ).then((_) {
+          model.selectProduct(null);
+        });
       },
     );
   }
 
   @override
   Widget build(BuildContext context) {
-    return ScopedModelDescendant<ProductModel>(
-      builder: (BuildContext context, Widget child, ProductModel model) {
+    return ScopedModelDescendant<MainModel>(
+      builder: (BuildContext context, Widget child, MainModel model) {
         return ListView.builder(
           itemBuilder: (BuildContext context, int index) {
             return Dismissible(
-              key: Key(model.products[index].title),
+              key: Key(model.allProducts[index].title),
               background: Container(color: Colors.red),
               direction: DismissDirection.endToStart,
               onDismissed: (DismissDirection direction) {
@@ -42,12 +43,12 @@ class ProductList extends StatelessWidget {
                   ListTile(
                     leading: CircleAvatar(
                       backgroundImage: AssetImage(
-                        model.products[index].image,
+                        model.allProducts[index].image,
                       ),
                     ),
-                    title: Text(model.products[index].title),
+                    title: Text(model.allProducts[index].title),
                     subtitle:
-                        Text('\$${model.products[index].price.toString()}'),
+                        Text('\$${model.allProducts[index].price.toString()}'),
                     trailing: _buildEditButton(context, index, model),
                   ),
                   Divider(),
@@ -55,7 +56,7 @@ class ProductList extends StatelessWidget {
               ),
             );
           },
-          itemCount: model.products.length,
+          itemCount: model.allProducts.length,
         );
       },
     );
