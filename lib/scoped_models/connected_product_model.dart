@@ -70,6 +70,7 @@ mixin ProductModel on ConnectedProductModel {
 
   void deleteProduct() {
     _products.removeAt(selectedProductIndex);
+    _selProductIndex = null;
     notifyListeners();
   }
 
