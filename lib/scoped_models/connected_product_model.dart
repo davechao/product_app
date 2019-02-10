@@ -9,23 +9,27 @@ mixin ConnectedProductModel on Model {
   int _selProductIndex;
   User _authenticatedUser;
 
+  final serverUrl =
+      'https://flutter-products-b83d5.firebaseio.com/products.json';
+
   void addProduct(
       String title, String description, String image, double price) {
-    final serverUrl =
-        'https://flutter-products-b83d5.firebaseio.com/products.json';
     final imageUrl =
         'https://cdn.pixabay.com/photo/2015/10/02/12/00/chocolate-968457_960_720.jpg';
     final Map<String, dynamic> productData = {
       'title': title,
       'description': description,
       'image': imageUrl,
-      'price': price
+      'price': price,
+      'userEmail': _authenticatedUser.email,
+      'userId': _authenticatedUser.id
     };
     final requestData = json.encode(productData);
     http.post(serverUrl, body: requestData).then((http.Response response) {
-      final Map<String, dynamic> responseData = json.decode(response.body);
+      final Map<String, dynamic> productData = json.decode(response.body);
+      print(productData);
       final Product newProduct = Product(
-        id: responseData['name'],
+        id: productData['name'],
         title: title,
         description: description,
         image: image,
@@ -89,6 +93,27 @@ mixin ProductModel on ConnectedProductModel {
     _products.removeAt(selectedProductIndex);
     _selProductIndex = null;
     notifyListeners();
+  }
+
+  void fetchProducts() {
+    http.get(serverUrl).then((http.Response response) {
+      final List<Product> fetchedProductList = [];
+      final Map<String, dynamic> productListData = json.decode(response.body);
+      if (productListData == null) return;
+      productListData.forEach((String productId, dynamic productData) {
+        final Product product = Product(
+            id: productId,
+            title: productData['title'],
+            description: productData['description'],
+            image: productData['image'],
+            price: productData['price'],
+            userEmail: productData['userEmail'],
+            userId: productData['userId']);
+        fetchedProductList.add(product);
+      });
+      _products = fetchedProductList;
+      notifyListeners();
+    });
   }
 
   void toggleProductFavoriteStatus() {

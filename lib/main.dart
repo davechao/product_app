@@ -18,7 +18,7 @@ class MyApp extends StatefulWidget {
 }
 
 class _MyAppState extends State<MyApp> {
-  Widget _buildMaterialApp() {
+  Widget _buildMaterialApp(MainModel model) {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
       theme: ThemeData(
@@ -28,7 +28,7 @@ class _MyAppState extends State<MyApp> {
       ),
       routes: {
         '/': (context) => Auth(),
-        '/products': (context) => ProductCardList(),
+        '/products': (context) => ProductCardList(model),
         '/admin': (context) => ProductsAdmin(),
       },
       onGenerateRoute: (RouteSettings settings) {
@@ -46,7 +46,7 @@ class _MyAppState extends State<MyApp> {
       },
       onUnknownRoute: (RouteSettings settings) {
         return MaterialPageRoute(
-          builder: (context) => ProductCardList(),
+          builder: (context) => ProductCardList(model),
         );
       },
     );
@@ -54,9 +54,10 @@ class _MyAppState extends State<MyApp> {
 
   @override
   Widget build(BuildContext context) {
+    final MainModel model = MainModel();
     return ScopedModel<MainModel>(
-      model: MainModel(),
-      child: _buildMaterialApp(),
+      model: model,
+      child: _buildMaterialApp(model),
     );
   }
 }

@@ -42,7 +42,7 @@ class ProductList extends StatelessWidget {
                 children: <Widget>[
                   ListTile(
                     leading: CircleAvatar(
-                      backgroundImage: AssetImage(
+                      backgroundImage: NetworkImage(
                         model.allProducts[index].image,
                       ),
                     ),
