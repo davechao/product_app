@@ -35,6 +35,35 @@ class _ProductCardListState extends State<ProductCardList> {
     );
   }
 
+  Widget _buildFavoriteIconButton() {
+    return ScopedModelDescendant<MainModel>(
+      builder: (BuildContext context, Widget child, MainModel model) {
+        return IconButton(
+          icon: Icon(model.displayFavoritesOnly
+              ? Icons.favorite
+              : Icons.favorite_border),
+          onPressed: () {
+            model.toggleDisplayMode();
+          },
+        );
+      },
+    );
+  }
+
+  Widget _buildProductListView() {
+    return ScopedModelDescendant<MainModel>(
+      builder: (BuildContext context, Widget child, MainModel model) {
+        Widget content = Center(child: Text('No Products Found!'));
+        if (model.displayedProducts.length > 0 && !model.isLoading) {
+          content = ProductListView();
+        } else if (model.isLoading) {
+          content = Center(child: CircularProgressIndicator());
+        }
+        return content;
+      },
+    );
+  }
+
   @override
   void initState() {
     widget.model.fetchProducts();
@@ -48,21 +77,10 @@ class _ProductCardListState extends State<ProductCardList> {
       appBar: AppBar(
         title: Text("Products"),
         actions: <Widget>[
-          ScopedModelDescendant<MainModel>(
-            builder: (BuildContext context, Widget child, MainModel model) {
-              return IconButton(
-                icon: Icon(model.displayFavoritesOnly
-                    ? Icons.favorite
-                    : Icons.favorite_border),
-                onPressed: () {
-                  model.toggleDisplayMode();
-                },
-              );
-            },
-          ),
+          _buildFavoriteIconButton(),
         ],
       ),
-      body: ProductListView(),
+      body: _buildProductListView(),
     );
   }
 }

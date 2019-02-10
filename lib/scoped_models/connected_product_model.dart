@@ -3,17 +3,21 @@ import 'package:product_app/models/user.dart';
 import 'package:scoped_model/scoped_model.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
+import 'dart:async';
 
 mixin ConnectedProductModel on Model {
   List<Product> _products = [];
   int _selProductIndex;
   User _authenticatedUser;
+  bool _isLoading = false;
 
   final serverUrl =
       'https://flutter-products-b83d5.firebaseio.com/products.json';
 
-  void addProduct(
+  Future<Null> addProduct(
       String title, String description, String image, double price) {
+    _isLoading = true;
+    notifyListeners();
     final imageUrl =
         'https://cdn.pixabay.com/photo/2015/10/02/12/00/chocolate-968457_960_720.jpg';
     final Map<String, dynamic> productData = {
@@ -25,7 +29,7 @@ mixin ConnectedProductModel on Model {
       'userId': _authenticatedUser.id
     };
     final requestData = json.encode(productData);
-    http.post(serverUrl, body: requestData).then((http.Response response) {
+    return http.post(serverUrl, body: requestData).then((http.Response response) {
       final Map<String, dynamic> productData = json.decode(response.body);
       print(productData);
       final Product newProduct = Product(
@@ -38,6 +42,7 @@ mixin ConnectedProductModel on Model {
         userId: _authenticatedUser.id,
       );
       _products.add(newProduct);
+      _isLoading = false;
       notifyListeners();
     });
   }
@@ -96,10 +101,16 @@ mixin ProductModel on ConnectedProductModel {
   }
 
   void fetchProducts() {
+    _isLoading = true;
+    notifyListeners();
     http.get(serverUrl).then((http.Response response) {
       final List<Product> fetchedProductList = [];
       final Map<String, dynamic> productListData = json.decode(response.body);
-      if (productListData == null) return;
+      if (productListData == null) {
+        _isLoading = false;
+        notifyListeners();
+        return;
+      }
       productListData.forEach((String productId, dynamic productData) {
         final Product product = Product(
             id: productId,
@@ -112,6 +123,7 @@ mixin ProductModel on ConnectedProductModel {
         fetchedProductList.add(product);
       });
       _products = fetchedProductList;
+      _isLoading = false;
       notifyListeners();
     });
   }
@@ -140,5 +152,11 @@ mixin ProductModel on ConnectedProductModel {
   void toggleDisplayMode() {
     _showFavorites = !_showFavorites;
     notifyListeners();
+  }
+}
+
+mixin UtilityModel on ConnectedProductModel {
+  bool get isLoading {
+    return _isLoading;
   }
 }
