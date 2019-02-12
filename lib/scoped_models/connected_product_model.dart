@@ -29,9 +29,10 @@ mixin ConnectedProductModel on Model {
       'userId': _authenticatedUser.id
     };
     final requestData = json.encode(productData);
-    return http.post(serverUrl, body: requestData).then((http.Response response) {
+    return http
+        .post(serverUrl, body: requestData)
+        .then((http.Response response) {
       final Map<String, dynamic> productData = json.decode(response.body);
-      print(productData);
       final Product newProduct = Product(
         id: productData['name'],
         title: title,
@@ -80,18 +81,39 @@ mixin ProductModel on ConnectedProductModel {
     return _showFavorites;
   }
 
-  void updateProduct(
+  Future<Null> updateProduct(
       String title, String description, String image, double price) {
-    final Product updatedProduct = Product(
-      title: title,
-      description: description,
-      image: image,
-      price: price,
-      userEmail: selectedProduct.userEmail,
-      userId: selectedProduct.userId,
-    );
-    _products[selectedProductIndex] = updatedProduct;
+    _isLoading = true;
     notifyListeners();
+    final serverUrl =
+        "https://flutter-products-b83d5.firebaseio.com/products/${selectedProduct.id}.json";
+    final imageUrl =
+        'https://cdn.pixabay.com/photo/2015/10/02/12/00/chocolate-968457_960_720.jpg';
+    final Map<String, dynamic> updateData = {
+      'title': title,
+      'description': description,
+      'image': imageUrl,
+      'price': price,
+      'userEmail': selectedProduct.userEmail,
+      'userId': selectedProduct.userId
+    };
+    final requestData = json.encode(updateData);
+    return http
+        .put(serverUrl, body: requestData)
+        .then((http.Response response) {
+      final Product updatedProduct = Product(
+        id: selectedProduct.id,
+        title: title,
+        description: description,
+        image: image,
+        price: price,
+        userEmail: selectedProduct.userEmail,
+        userId: selectedProduct.userId,
+      );
+      _products[selectedProductIndex] = updatedProduct;
+      _isLoading = false;
+      notifyListeners();
+    });
   }
 
   void deleteProduct() {

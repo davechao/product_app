@@ -29,7 +29,7 @@ class _MyAppState extends State<MyApp> {
       routes: {
         '/': (context) => Auth(),
         '/products': (context) => ProductCardList(model),
-        '/admin': (context) => ProductsAdmin(),
+        '/admin': (context) => ProductsAdmin(model),
       },
       onGenerateRoute: (RouteSettings settings) {
         final List<String> pathElements = settings.name.split('/');
