@@ -130,10 +130,10 @@ mixin ProductModel on ConnectedProductModel {
     });
   }
 
-  void fetchProducts() {
+  Future<Null> fetchProducts() {
     _isLoading = true;
     notifyListeners();
-    http.get(serverUrl).then((http.Response response) {
+    return http.get(serverUrl).then((http.Response response) {
       final List<Product> fetchedProductList = [];
       final Map<String, dynamic> productListData = json.decode(response.body);
       if (productListData == null) {
