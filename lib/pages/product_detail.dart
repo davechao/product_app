@@ -1,13 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:product_app/models/product.dart';
-import 'package:product_app/scoped_models/main_model.dart';
 import 'package:product_app/widgets/ui_elements/title_default.dart';
-import 'package:scoped_model/scoped_model.dart';
 
 class ProductDetail extends StatelessWidget {
-  final int productIndex;
+  final Product product;
 
-  ProductDetail(this.productIndex);
+  ProductDetail(this.product);
 
   Widget _buildAddressPriceRow(double price) {
     return Row(
@@ -38,32 +36,6 @@ class ProductDetail extends StatelessWidget {
     );
   }
 
-  Widget _buildPageContent(Product product) {
-    return Scaffold(
-      appBar: AppBar(
-        title: Text(product.title),
-      ),
-      body: Column(
-        crossAxisAlignment: CrossAxisAlignment.center,
-        children: <Widget>[
-          Image.network(product.image),
-          Container(
-            padding: EdgeInsets.all(10.0),
-            child: TitleDefault(product.title),
-          ),
-          _buildAddressPriceRow(product.price),
-          Container(
-            padding: EdgeInsets.all(10.0),
-            child: Text(
-              product.description,
-              textAlign: TextAlign.center,
-            ),
-          )
-        ],
-      ),
-    );
-  }
-
   @override
   Widget build(BuildContext context) {
     return WillPopScope(
@@ -72,11 +44,33 @@ class ProductDetail extends StatelessWidget {
         Navigator.pop(context, false);
         return Future.value(false);
       },
-      child: ScopedModelDescendant<MainModel>(
-        builder: (BuildContext context, Widget child, MainModel model) {
-          final Product product = model.allProducts[productIndex];
-          return _buildPageContent(product);
-        },
+      child: Scaffold(
+        appBar: AppBar(
+          title: Text(product.title),
+        ),
+        body: Column(
+          crossAxisAlignment: CrossAxisAlignment.center,
+          children: <Widget>[
+            FadeInImage(
+              image: NetworkImage(product.image),
+              height: 300.0,
+              fit: BoxFit.cover,
+              placeholder: AssetImage('assets/food.jpg'),
+            ),
+            Container(
+              padding: EdgeInsets.all(10.0),
+              child: TitleDefault(product.title),
+            ),
+            _buildAddressPriceRow(product.price),
+            Container(
+              padding: EdgeInsets.all(10.0),
+              child: Text(
+                product.description,
+                textAlign: TextAlign.center,
+              ),
+            )
+          ],
+        ),
       ),
     );
   }

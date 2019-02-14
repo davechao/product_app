@@ -7,7 +7,7 @@ import 'dart:async';
 
 mixin ConnectedProductModel on Model {
   List<Product> _products = [];
-  int _selProductIndex;
+  String _selProductId;
   User _authenticatedUser;
   bool _isLoading = false;
 
@@ -69,12 +69,20 @@ mixin ProductModel on ConnectedProductModel {
   }
 
   int get selectedProductIndex {
-    return _selProductIndex;
+    return _products.indexWhere((Product product) {
+      return product.id == selectedProductId;
+    });
+  }
+
+  String get selectedProductId {
+    return _selProductId;
   }
 
   Product get selectedProduct {
-    if (selectedProductIndex == null) return null;
-    return _products[selectedProductIndex];
+    if (selectedProductId == null) return null;
+    return _products.firstWhere((Product product) {
+      return product.id == selectedProductId;
+    });
   }
 
   bool get displayFavoritesOnly {
@@ -120,7 +128,7 @@ mixin ProductModel on ConnectedProductModel {
     _isLoading = true;
     final deletedProductId = selectedProduct.id;
     _products.removeAt(selectedProductIndex);
-    _selProductIndex = null;
+    _selProductId = null;
     notifyListeners();
     final serverUrl =
         "https://flutter-products-b83d5.firebaseio.com/products/$deletedProductId.json";
@@ -155,6 +163,7 @@ mixin ProductModel on ConnectedProductModel {
       _products = fetchedProductList;
       _isLoading = false;
       notifyListeners();
+      _selProductId = null;
     });
   }
 
@@ -162,6 +171,7 @@ mixin ProductModel on ConnectedProductModel {
     final bool isCurrentlyFavorite = selectedProduct.isFavorite;
     final bool newFavoriteStatus = !isCurrentlyFavorite;
     final Product updateProduct = Product(
+      id: selectedProduct.id,
       title: selectedProduct.title,
       description: selectedProduct.description,
       price: selectedProduct.price,
@@ -174,9 +184,9 @@ mixin ProductModel on ConnectedProductModel {
     notifyListeners();
   }
 
-  void selectProduct(int index) {
-    _selProductIndex = index;
-    if (index != null) {
+  void selectProduct(String productId) {
+    _selProductId = productId;
+    if (_selProductId != null) {
       notifyListeners();
     }
   }
