@@ -14,7 +14,7 @@ mixin ConnectedProductModel on Model {
   final serverUrl =
       'https://flutter-products-b83d5.firebaseio.com/products.json';
 
-  Future<Null> addProduct(
+  Future<bool> addProduct(
       String title, String description, String image, double price) {
     _isLoading = true;
     notifyListeners();
@@ -32,6 +32,11 @@ mixin ConnectedProductModel on Model {
     return http
         .post(serverUrl, body: requestData)
         .then((http.Response response) {
+      if (response.statusCode != 200 && response.statusCode != 201) {
+        _isLoading = false;
+        notifyListeners();
+        return false;
+      }
       final Map<String, dynamic> productData = json.decode(response.body);
       final Product newProduct = Product(
         id: productData['name'],
@@ -45,6 +50,11 @@ mixin ConnectedProductModel on Model {
       _products.add(newProduct);
       _isLoading = false;
       notifyListeners();
+      return true;
+    }).catchError((error) {
+      _isLoading = false;
+      notifyListeners();
+      return false;
     });
   }
 }
@@ -89,7 +99,7 @@ mixin ProductModel on ConnectedProductModel {
     return _showFavorites;
   }
 
-  Future<Null> updateProduct(
+  Future<bool> updateProduct(
       String title, String description, String image, double price) {
     _isLoading = true;
     notifyListeners();
@@ -121,10 +131,15 @@ mixin ProductModel on ConnectedProductModel {
       _products[selectedProductIndex] = updatedProduct;
       _isLoading = false;
       notifyListeners();
+      return true;
+    }).catchError((error) {
+      _isLoading = false;
+      notifyListeners();
+      return false;
     });
   }
 
-  void deleteProduct() {
+  Future<bool> deleteProduct() {
     _isLoading = true;
     final deletedProductId = selectedProduct.id;
     _products.removeAt(selectedProductIndex);
@@ -132,16 +147,21 @@ mixin ProductModel on ConnectedProductModel {
     notifyListeners();
     final serverUrl =
         "https://flutter-products-b83d5.firebaseio.com/products/$deletedProductId.json";
-    http.delete(serverUrl).then((http.Response response) {
+    return http.delete(serverUrl).then((http.Response response) {
       _isLoading = false;
       notifyListeners();
+      return true;
+    }).catchError((error) {
+      _isLoading = false;
+      notifyListeners();
+      return false;
     });
   }
 
   Future<Null> fetchProducts() {
     _isLoading = true;
     notifyListeners();
-    return http.get(serverUrl).then((http.Response response) {
+    return http.get(serverUrl).then<Null>((http.Response response) {
       final List<Product> fetchedProductList = [];
       final Map<String, dynamic> productListData = json.decode(response.body);
       if (productListData == null) {
@@ -164,6 +184,10 @@ mixin ProductModel on ConnectedProductModel {
       _isLoading = false;
       notifyListeners();
       _selProductId = null;
+    }).catchError((error) {
+      _isLoading = false;
+      notifyListeners();
+      return;
     });
   }
 

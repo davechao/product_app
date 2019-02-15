@@ -144,16 +144,56 @@ class _ProductEditState extends State<ProductEdit> {
         _formData['description'],
         _formData['image'],
         _formData['price'],
-      ).then((_) => Navigator.pushReplacementNamed(context, '/products')
-          .then((_) => selectProduct(null)));
+      ).then((bool success) {
+        if (success) {
+          Navigator.pushReplacementNamed(context, '/products')
+              .then((_) => selectProduct(null));
+        } else {
+          showDialog(
+            context: context,
+            builder: (BuildContext context) {
+              return AlertDialog(
+                title: Text('Something went wrong'),
+                content: Text('Please try again!'),
+                actions: <Widget>[
+                  FlatButton(
+                    child: Text('Okay'),
+                    onPressed: () => Navigator.of(context).pop(),
+                  ),
+                ],
+              );
+            },
+          );
+        }
+      });
     } else {
       updateProduct(
         _formData['title'],
         _formData['description'],
         _formData['image'],
         _formData['price'],
-      ).then((_) => Navigator.pushReplacementNamed(context, '/products')
-          .then((_) => selectProduct(null)));
+      ).then((bool success) {
+        if (success) {
+          Navigator.pushReplacementNamed(context, '/products')
+              .then((_) => selectProduct(null));
+        } else {
+          showDialog(
+            context: context,
+            builder: (BuildContext context) {
+              return AlertDialog(
+                title: Text('Something went wrong'),
+                content: Text('Please try again!'),
+                actions: <Widget>[
+                  FlatButton(
+                    child: Text('Okay'),
+                    onPressed: () => Navigator.of(context).pop(),
+                  ),
+                ],
+              );
+            },
+          );
+        }
+      });
     }
   }
 
