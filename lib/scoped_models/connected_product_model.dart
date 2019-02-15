@@ -15,7 +15,7 @@ mixin ConnectedProductModel on Model {
       'https://flutter-products-b83d5.firebaseio.com/products.json';
 
   Future<bool> addProduct(
-      String title, String description, String image, double price) {
+      String title, String description, String image, double price) async {
     _isLoading = true;
     notifyListeners();
     final imageUrl =
@@ -29,17 +29,17 @@ mixin ConnectedProductModel on Model {
       'userId': _authenticatedUser.id
     };
     final requestData = json.encode(productData);
-    return http
-        .post(serverUrl, body: requestData)
-        .then((http.Response response) {
+    try {
+      final http.Response response =
+          await http.post(serverUrl, body: requestData);
       if (response.statusCode != 200 && response.statusCode != 201) {
         _isLoading = false;
         notifyListeners();
         return false;
       }
-      final Map<String, dynamic> productData = json.decode(response.body);
+      final Map<String, dynamic> responseData = json.decode(response.body);
       final Product newProduct = Product(
-        id: productData['name'],
+        id: responseData['name'],
         title: title,
         description: description,
         image: image,
@@ -51,11 +51,11 @@ mixin ConnectedProductModel on Model {
       _isLoading = false;
       notifyListeners();
       return true;
-    }).catchError((error) {
+    } catch (error) {
       _isLoading = false;
       notifyListeners();
       return false;
-    });
+    }
   }
 }
 
@@ -100,7 +100,7 @@ mixin ProductModel on ConnectedProductModel {
   }
 
   Future<bool> updateProduct(
-      String title, String description, String image, double price) {
+      String title, String description, String image, double price) async {
     _isLoading = true;
     notifyListeners();
     final serverUrl =
@@ -116,9 +116,8 @@ mixin ProductModel on ConnectedProductModel {
       'userId': selectedProduct.userId
     };
     final requestData = json.encode(updateData);
-    return http
-        .put(serverUrl, body: requestData)
-        .then((http.Response response) {
+    try {
+      await http.put(serverUrl, body: requestData);
       final Product updatedProduct = Product(
         id: selectedProduct.id,
         title: title,
@@ -132,14 +131,14 @@ mixin ProductModel on ConnectedProductModel {
       _isLoading = false;
       notifyListeners();
       return true;
-    }).catchError((error) {
+    } catch (error) {
       _isLoading = false;
       notifyListeners();
       return false;
-    });
+    }
   }
 
-  Future<bool> deleteProduct() {
+  Future<bool> deleteProduct() async {
     _isLoading = true;
     final deletedProductId = selectedProduct.id;
     _products.removeAt(selectedProductIndex);
@@ -147,27 +146,28 @@ mixin ProductModel on ConnectedProductModel {
     notifyListeners();
     final serverUrl =
         "https://flutter-products-b83d5.firebaseio.com/products/$deletedProductId.json";
-    return http.delete(serverUrl).then((http.Response response) {
+    try {
+      await http.delete(serverUrl);
       _isLoading = false;
       notifyListeners();
       return true;
-    }).catchError((error) {
+    } catch (error) {
       _isLoading = false;
       notifyListeners();
       return false;
-    });
+    }
   }
 
-  Future<Null> fetchProducts() {
+  Future<Null> fetchProducts() async {
     _isLoading = true;
     notifyListeners();
-    return http.get(serverUrl).then<Null>((http.Response response) {
+    try {
+      final http.Response response = await http.get(serverUrl);
       final List<Product> fetchedProductList = [];
       final Map<String, dynamic> productListData = json.decode(response.body);
       if (productListData == null) {
         _isLoading = false;
         notifyListeners();
-        return;
       }
       productListData.forEach((String productId, dynamic productData) {
         final Product product = Product(
@@ -184,11 +184,10 @@ mixin ProductModel on ConnectedProductModel {
       _isLoading = false;
       notifyListeners();
       _selProductId = null;
-    }).catchError((error) {
+    } catch (error) {
       _isLoading = false;
       notifyListeners();
-      return;
-    });
+    }
   }
 
   void toggleProductFavoriteStatus() {
