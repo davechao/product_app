@@ -10,9 +10,49 @@ mixin ConnectedProductModel on Model {
   String _selProductId;
   User _authenticatedUser;
   bool _isLoading = false;
+}
 
+mixin UserModel on ConnectedProductModel {
+  void login(String email, String password) {
+    _authenticatedUser = User(id: 'userId', email: email, password: password);
+  }
+}
+
+mixin ProductModel on ConnectedProductModel {
+  bool _showFavorites = false;
   final serverUrl =
       'https://flutter-products-b83d5.firebaseio.com/products.json';
+
+  List<Product> get allProducts {
+    return List.from(_products);
+  }
+
+  List<Product> get displayedProducts {
+    if (_showFavorites)
+      return _products.where((Product product) => product.isFavorite).toList();
+    return List.from(_products);
+  }
+
+  int get selectedProductIndex {
+    return _products.indexWhere((Product product) {
+      return product.id == selectedProductId;
+    });
+  }
+
+  String get selectedProductId {
+    return _selProductId;
+  }
+
+  Product get selectedProduct {
+    if (selectedProductId == null) return null;
+    return _products.firstWhere((Product product) {
+      return product.id == selectedProductId;
+    });
+  }
+
+  bool get displayFavoritesOnly {
+    return _showFavorites;
+  }
 
   Future<bool> addProduct(
       String title, String description, String image, double price) async {
@@ -56,47 +96,6 @@ mixin ConnectedProductModel on Model {
       notifyListeners();
       return false;
     }
-  }
-}
-
-mixin UserModel on ConnectedProductModel {
-  void login(String email, String password) {
-    _authenticatedUser = User(id: 'userId', email: email, password: password);
-  }
-}
-
-mixin ProductModel on ConnectedProductModel {
-  bool _showFavorites = false;
-
-  List<Product> get allProducts {
-    return List.from(_products);
-  }
-
-  List<Product> get displayedProducts {
-    if (_showFavorites)
-      return _products.where((Product product) => product.isFavorite).toList();
-    return List.from(_products);
-  }
-
-  int get selectedProductIndex {
-    return _products.indexWhere((Product product) {
-      return product.id == selectedProductId;
-    });
-  }
-
-  String get selectedProductId {
-    return _selProductId;
-  }
-
-  Product get selectedProduct {
-    if (selectedProductId == null) return null;
-    return _products.firstWhere((Product product) {
-      return product.id == selectedProductId;
-    });
-  }
-
-  bool get displayFavoritesOnly {
-    return _showFavorites;
   }
 
   Future<bool> updateProduct(
