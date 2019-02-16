@@ -2,6 +2,11 @@ import 'package:flutter/material.dart';
 import 'package:product_app/scoped_models/main_model.dart';
 import 'package:scoped_model/scoped_model.dart';
 
+enum AuthMode {
+  SignUp,
+  Login,
+}
+
 class Auth extends StatefulWidget {
   @override
   State<StatefulWidget> createState() {
@@ -16,6 +21,8 @@ class _AuthState extends State<Auth> {
     'acceptTerms': false
   };
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
+  final TextEditingController _passwordTextController = TextEditingController();
+  AuthMode _authMode = AuthMode.Login;
 
   DecorationImage _buildBackgroundImage() {
     return DecorationImage(
@@ -57,6 +64,7 @@ class _AuthState extends State<Auth> {
         fillColor: Colors.white,
       ),
       obscureText: true,
+      controller: _passwordTextController,
       validator: (String value) {
         if (value.isEmpty || value.length < 6) {
           return 'Password invalid';
@@ -64,6 +72,22 @@ class _AuthState extends State<Auth> {
       },
       onSaved: (String value) {
         _formData['password'] = value;
+      },
+    );
+  }
+
+  Widget _buildPasswordConfirmTextField() {
+    return TextFormField(
+      decoration: InputDecoration(
+        labelText: 'Confirm Password',
+        filled: true,
+        fillColor: Colors.white,
+      ),
+      obscureText: true,
+      validator: (String value) {
+        if (_passwordTextController.text != value) {
+          return 'Password do not match.';
+        }
       },
     );
   }
@@ -81,11 +105,18 @@ class _AuthState extends State<Auth> {
     );
   }
 
-  _submitForm(Function login) {
+  _submitForm(Function login, Function signUp) async {
     if (!_formKey.currentState.validate() || !_formData['acceptTerms']) return;
     _formKey.currentState.save();
-    login(_formData['email'], _formData['password']);
-    Navigator.pushReplacementNamed(context, '/products');
+    if (_authMode == AuthMode.Login) {
+      login(_formData['email'], _formData['password']);
+    } else {
+      final Map<String, dynamic> successInformation =
+          await signUp(_formData['email'], _formData['password']);
+      if (successInformation['success']) {
+        Navigator.pushReplacementNamed(context, '/products');
+      }
+    }
   }
 
   @override
@@ -115,13 +146,24 @@ class _AuthState extends State<Auth> {
                   child: Column(
                     children: <Widget>[
                       _buildEmailTextField(),
-                      SizedBox(
-                        height: 10.0,
-                      ),
+                      SizedBox(height: 10.0),
                       _buildPasswordTextField(),
+                      SizedBox(height: 10.0),
+                      _authMode == AuthMode.SignUp
+                          ? _buildPasswordConfirmTextField()
+                          : Container(),
                       _buildAcceptSwitch(),
-                      SizedBox(
-                        height: 10.0,
+                      SizedBox(height: 10.0),
+                      FlatButton(
+                        child: Text(
+                            'Switch to ${_authMode == AuthMode.Login ? 'Sign up' : 'Login'}'),
+                        onPressed: () {
+                          setState(() {
+                            _authMode = _authMode == AuthMode.Login
+                                ? AuthMode.SignUp
+                                : AuthMode.Login;
+                          });
+                        },
                       ),
                       ScopedModelDescendant<MainModel>(
                         builder: (BuildContext context, Widget child,
@@ -130,7 +172,8 @@ class _AuthState extends State<Auth> {
                             child: Text('LOGIN'),
                             color: Colors.deepOrange,
                             textColor: Colors.white,
-                            onPressed: () => _submitForm(model.login),
+                            onPressed: () =>
+                                _submitForm(model.login, model.signUp),
                           );
                         },
                       ),

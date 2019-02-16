@@ -13,15 +13,36 @@ mixin ConnectedProductModel on Model {
 }
 
 mixin UserModel on ConnectedProductModel {
+  final authUrl =
+      'https://www.googleapis.com/identitytoolkit/v3/relyingparty/signupNewUser?key=AIzaSyC4PNlXuVCsxgOUCnCwn9wYQcuyBPqZ5-M';
+
   void login(String email, String password) {
     _authenticatedUser = User(id: 'userId', email: email, password: password);
+  }
+
+  Future<Map<String, dynamic>> signUp(String email, String password) async {
+    final Map<String, dynamic> authData = {
+      'email': email,
+      'password': password,
+      'returnSecureToken': true
+    };
+    final requestData = json.encode(authData);
+    try {
+      final http.Response response = await http.post(
+        authUrl,
+        body: requestData,
+        headers: {'Content-Type': 'application/json'},
+      );
+      return {'success': true, 'message': 'Authentication succeeded!'};
+    } catch (error) {
+      return {'success': false, 'message': 'Authentication failed!'};
+    }
   }
 }
 
 mixin ProductModel on ConnectedProductModel {
   bool _showFavorites = false;
-  final serverUrl =
-      'https://flutter-products-b83d5.firebaseio.com/products.json';
+  final dbUrl = 'https://flutter-products-b83d5.firebaseio.com/products.json';
 
   List<Product> get allProducts {
     return List.from(_products);
@@ -70,8 +91,7 @@ mixin ProductModel on ConnectedProductModel {
     };
     final requestData = json.encode(productData);
     try {
-      final http.Response response =
-          await http.post(serverUrl, body: requestData);
+      final http.Response response = await http.post(dbUrl, body: requestData);
       if (response.statusCode != 200 && response.statusCode != 201) {
         _isLoading = false;
         notifyListeners();
@@ -161,7 +181,7 @@ mixin ProductModel on ConnectedProductModel {
     _isLoading = true;
     notifyListeners();
     try {
-      final http.Response response = await http.get(serverUrl);
+      final http.Response response = await http.get(dbUrl);
       final List<Product> fetchedProductList = [];
       final Map<String, dynamic> productListData = json.decode(response.body);
       if (productListData == null) {
