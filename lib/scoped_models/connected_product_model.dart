@@ -1,3 +1,4 @@
+import 'package:product_app/models/auth.dart';
 import 'package:product_app/models/product.dart';
 import 'package:product_app/models/user.dart';
 import 'package:scoped_model/scoped_model.dart';
@@ -13,12 +14,13 @@ mixin ConnectedProductModel on Model {
 }
 
 mixin UserModel on ConnectedProductModel {
-  final signUpUrl =
-      'https://www.googleapis.com/identitytoolkit/v3/relyingparty/signupNewUser?key=AIzaSyC4PNlXuVCsxgOUCnCwn9wYQcuyBPqZ5-M';
   final signInUrl =
       'https://www.googleapis.com/identitytoolkit/v3/relyingparty/verifyPassword?key=AIzaSyC4PNlXuVCsxgOUCnCwn9wYQcuyBPqZ5-M';
+  final signUpUrl =
+      'https://www.googleapis.com/identitytoolkit/v3/relyingparty/signupNewUser?key=AIzaSyC4PNlXuVCsxgOUCnCwn9wYQcuyBPqZ5-M';
 
-  Future<Map<String, dynamic>> signUp(String email, String password) async {
+  Future<Map<String, dynamic>> authenticate(String email, String password,
+      [AuthMode authMode = AuthMode.Login]) async {
     _isLoading = true;
     notifyListeners();
     bool hasError = true;
@@ -30,49 +32,26 @@ mixin UserModel on ConnectedProductModel {
     };
     final requestData = json.encode(authData);
     try {
-      final http.Response response = await http.post(
-        signUpUrl,
-        body: requestData,
-        headers: {'Content-Type': 'application/json'},
-      );
+      http.Response response;
+      if (authMode == AuthMode.Login) {
+        response = await http.post(
+          signInUrl,
+          body: requestData,
+          headers: {'Content-Type': 'application/json'},
+        );
+      } else {
+        response = await http.post(
+          signUpUrl,
+          body: requestData,
+          headers: {'Content-Type': 'application/json'},
+        );
+      }
       final Map<String, dynamic> responseData = json.decode(response.body);
       if (responseData.containsKey('idToken')) {
         hasError = false;
-        message = 'Sign up succeeded!';
+        message = 'Authentication succeeded!';
       } else if (responseData['error']['message'] == 'EMAIL_EXISTS') {
         message = 'This email already exists.';
-      }
-      _isLoading = false;
-      notifyListeners();
-      return {'success': !hasError, 'message': message};
-    } catch (error) {
-      _isLoading = false;
-      notifyListeners();
-      return {'success': !hasError, 'message': message};
-    }
-  }
-
-  Future<Map<String, dynamic>> signIn(String email, String password) async {
-    _isLoading = true;
-    notifyListeners();
-    bool hasError = true;
-    String message = 'Something went wrong.';
-    final Map<String, dynamic> authData = {
-      'email': email,
-      'password': password,
-      'returnSecureToken': true
-    };
-    final requestData = json.encode(authData);
-    try {
-      final http.Response response = await http.post(
-        signInUrl,
-        body: requestData,
-        headers: {'Content-Type': 'application/json'},
-      );
-      final Map<String, dynamic> responseData = json.decode(response.body);
-      if (responseData.containsKey('idToken')) {
-        hasError = false;
-        message = 'Sign in succeeded!';
       } else if (responseData['error']['message'] == 'EMAIL_NOT_FOUND') {
         message = 'This email was not found.';
       } else if (responseData['error']['message'] == 'INVALID_PASSWORD') {
