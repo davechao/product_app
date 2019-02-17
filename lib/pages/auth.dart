@@ -105,33 +105,33 @@ class _AuthState extends State<Auth> {
     );
   }
 
-  _submitForm(Function login, Function signUp) async {
+  _submitForm(Function signIn, Function signUp) async {
     if (!_formKey.currentState.validate() || !_formData['acceptTerms']) return;
     _formKey.currentState.save();
+    Map<String, dynamic> successInfo;
     if (_authMode == AuthMode.Login) {
-      login(_formData['email'], _formData['password']);
+      successInfo = await signIn(_formData['email'], _formData['password']);
     } else {
-      final Map<String, dynamic> successInformation =
-          await signUp(_formData['email'], _formData['password']);
-      if (successInformation['success']) {
-        Navigator.pushReplacementNamed(context, '/products');
-      } else {
-        showDialog(
-          context: context,
-          builder: (BuildContext context) {
-            return AlertDialog(
-              title: Text('An Error Occurred!'),
-              content: Text(successInformation['message']),
-              actions: <Widget>[
-                FlatButton(
-                  child: Text('Okay'),
-                  onPressed: () => Navigator.of(context).pop(),
-                ),
-              ],
-            );
-          },
-        );
-      }
+      successInfo = await signUp(_formData['email'], _formData['password']);
+    }
+    if (successInfo['success']) {
+      Navigator.pushReplacementNamed(context, '/products');
+    } else {
+      showDialog(
+        context: context,
+        builder: (BuildContext context) {
+          return AlertDialog(
+            title: Text('An Error Occurred!'),
+            content: Text(successInfo['message']),
+            actions: <Widget>[
+              FlatButton(
+                child: Text('Okay'),
+                onPressed: () => Navigator.of(context).pop(),
+              ),
+            ],
+          );
+        },
+      );
     }
   }
 
@@ -193,7 +193,7 @@ class _AuthState extends State<Auth> {
                                   color: Colors.deepOrange,
                                   textColor: Colors.white,
                                   onPressed: () =>
-                                      _submitForm(model.login, model.signUp),
+                                      _submitForm(model.signIn, model.signUp),
                                 );
                         },
                       ),

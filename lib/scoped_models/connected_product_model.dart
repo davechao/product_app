@@ -13,12 +13,10 @@ mixin ConnectedProductModel on Model {
 }
 
 mixin UserModel on ConnectedProductModel {
-  final authUrl =
+  final signUpUrl =
       'https://www.googleapis.com/identitytoolkit/v3/relyingparty/signupNewUser?key=AIzaSyC4PNlXuVCsxgOUCnCwn9wYQcuyBPqZ5-M';
-
-  void login(String email, String password) {
-    _authenticatedUser = User(id: 'userId', email: email, password: password);
-  }
+  final signInUrl =
+      'https://www.googleapis.com/identitytoolkit/v3/relyingparty/verifyPassword?key=AIzaSyC4PNlXuVCsxgOUCnCwn9wYQcuyBPqZ5-M';
 
   Future<Map<String, dynamic>> signUp(String email, String password) async {
     _isLoading = true;
@@ -33,16 +31,52 @@ mixin UserModel on ConnectedProductModel {
     final requestData = json.encode(authData);
     try {
       final http.Response response = await http.post(
-        authUrl,
+        signUpUrl,
         body: requestData,
         headers: {'Content-Type': 'application/json'},
       );
       final Map<String, dynamic> responseData = json.decode(response.body);
       if (responseData.containsKey('idToken')) {
         hasError = false;
-        message = 'Authentication succeeded!';
+        message = 'Sign up succeeded!';
       } else if (responseData['error']['message'] == 'EMAIL_EXISTS') {
         message = 'This email already exists.';
+      }
+      _isLoading = false;
+      notifyListeners();
+      return {'success': !hasError, 'message': message};
+    } catch (error) {
+      _isLoading = false;
+      notifyListeners();
+      return {'success': !hasError, 'message': message};
+    }
+  }
+
+  Future<Map<String, dynamic>> signIn(String email, String password) async {
+    _isLoading = true;
+    notifyListeners();
+    bool hasError = true;
+    String message = 'Something went wrong.';
+    final Map<String, dynamic> authData = {
+      'email': email,
+      'password': password,
+      'returnSecureToken': true
+    };
+    final requestData = json.encode(authData);
+    try {
+      final http.Response response = await http.post(
+        signInUrl,
+        body: requestData,
+        headers: {'Content-Type': 'application/json'},
+      );
+      final Map<String, dynamic> responseData = json.decode(response.body);
+      if (responseData.containsKey('idToken')) {
+        hasError = false;
+        message = 'Sign in succeeded!';
+      } else if (responseData['error']['message'] == 'EMAIL_NOT_FOUND') {
+        message = 'This email was not found.';
+      } else if (responseData['error']['message'] == 'INVALID_PASSWORD') {
+        message = 'The password is invalid.';
       }
       _isLoading = false;
       notifyListeners();
