@@ -50,6 +50,11 @@ mixin UserModel on ConnectedProductModel {
       if (responseData.containsKey('idToken')) {
         hasError = false;
         message = 'Authentication succeeded!';
+        _authenticatedUser = User(
+          id: responseData['localId'],
+          email: responseData['email'],
+          token: responseData['idToken'],
+        );
       } else if (responseData['error']['message'] == 'EMAIL_EXISTS') {
         message = 'This email already exists.';
       } else if (responseData['error']['message'] == 'EMAIL_NOT_FOUND') {
@@ -70,7 +75,6 @@ mixin UserModel on ConnectedProductModel {
 
 mixin ProductModel on ConnectedProductModel {
   bool _showFavorites = false;
-  final dbUrl = 'https://flutter-products-b83d5.firebaseio.com/products.json';
 
   List<Product> get allProducts {
     return List.from(_products);
@@ -107,6 +111,8 @@ mixin ProductModel on ConnectedProductModel {
       String title, String description, String image, double price) async {
     _isLoading = true;
     notifyListeners();
+    final dbUrl =
+        'https://flutter-products-b83d5.firebaseio.com/products.json?auth=${_authenticatedUser.token}';
     final imageUrl =
         'https://cdn.pixabay.com/photo/2015/10/02/12/00/chocolate-968457_960_720.jpg';
     final Map<String, dynamic> productData = {
@@ -150,8 +156,8 @@ mixin ProductModel on ConnectedProductModel {
       String title, String description, String image, double price) async {
     _isLoading = true;
     notifyListeners();
-    final serverUrl =
-        "https://flutter-products-b83d5.firebaseio.com/products/${selectedProduct.id}.json";
+    final dbUrl =
+        "https://flutter-products-b83d5.firebaseio.com/products/${selectedProduct.id}.json?auth=${_authenticatedUser.token}";
     final imageUrl =
         'https://cdn.pixabay.com/photo/2015/10/02/12/00/chocolate-968457_960_720.jpg';
     final Map<String, dynamic> updateData = {
@@ -164,7 +170,7 @@ mixin ProductModel on ConnectedProductModel {
     };
     final requestData = json.encode(updateData);
     try {
-      await http.put(serverUrl, body: requestData);
+      await http.put(dbUrl, body: requestData);
       final Product updatedProduct = Product(
         id: selectedProduct.id,
         title: title,
@@ -191,10 +197,10 @@ mixin ProductModel on ConnectedProductModel {
     _products.removeAt(selectedProductIndex);
     _selProductId = null;
     notifyListeners();
-    final serverUrl =
-        "https://flutter-products-b83d5.firebaseio.com/products/$deletedProductId.json";
+    final dbUrl =
+        "https://flutter-products-b83d5.firebaseio.com/products/$deletedProductId.json?auth=${_authenticatedUser.token}";
     try {
-      await http.delete(serverUrl);
+      await http.delete(dbUrl);
       _isLoading = false;
       notifyListeners();
       return true;
@@ -208,6 +214,8 @@ mixin ProductModel on ConnectedProductModel {
   Future<Null> fetchProducts() async {
     _isLoading = true;
     notifyListeners();
+    final dbUrl =
+        'https://flutter-products-b83d5.firebaseio.com/products.json?auth=${_authenticatedUser.token}';
     try {
       final http.Response response = await http.get(dbUrl);
       final List<Product> fetchedProductList = [];
