@@ -115,6 +115,22 @@ class _AuthState extends State<Auth> {
           await signUp(_formData['email'], _formData['password']);
       if (successInformation['success']) {
         Navigator.pushReplacementNamed(context, '/products');
+      } else {
+        showDialog(
+          context: context,
+          builder: (BuildContext context) {
+            return AlertDialog(
+              title: Text('An Error Occurred!'),
+              content: Text(successInformation['message']),
+              actions: <Widget>[
+                FlatButton(
+                  child: Text('Okay'),
+                  onPressed: () => Navigator.of(context).pop(),
+                ),
+              ],
+            );
+          },
+        );
       }
     }
   }
@@ -168,13 +184,17 @@ class _AuthState extends State<Auth> {
                       ScopedModelDescendant<MainModel>(
                         builder: (BuildContext context, Widget child,
                             MainModel model) {
-                          return RaisedButton(
-                            child: Text('LOGIN'),
-                            color: Colors.deepOrange,
-                            textColor: Colors.white,
-                            onPressed: () =>
-                                _submitForm(model.login, model.signUp),
-                          );
+                          return model.isLoading
+                              ? CircularProgressIndicator()
+                              : RaisedButton(
+                                  child: Text(_authMode == AuthMode.Login
+                                      ? 'LOGIN'
+                                      : 'SIGN UP'),
+                                  color: Colors.deepOrange,
+                                  textColor: Colors.white,
+                                  onPressed: () =>
+                                      _submitForm(model.login, model.signUp),
+                                );
                         },
                       ),
                     ],
