@@ -2,6 +2,7 @@ import 'package:product_app/models/auth.dart';
 import 'package:product_app/models/product.dart';
 import 'package:product_app/models/user.dart';
 import 'package:scoped_model/scoped_model.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 import 'dart:async';
@@ -18,6 +19,10 @@ mixin UserModel on ConnectedProductModel {
       'https://www.googleapis.com/identitytoolkit/v3/relyingparty/verifyPassword?key=AIzaSyC4PNlXuVCsxgOUCnCwn9wYQcuyBPqZ5-M';
   final signUpUrl =
       'https://www.googleapis.com/identitytoolkit/v3/relyingparty/signupNewUser?key=AIzaSyC4PNlXuVCsxgOUCnCwn9wYQcuyBPqZ5-M';
+
+  User get user {
+    return _authenticatedUser;
+  }
 
   Future<Map<String, dynamic>> authenticate(String email, String password,
       [AuthMode authMode = AuthMode.Login]) async {
@@ -55,6 +60,11 @@ mixin UserModel on ConnectedProductModel {
           email: responseData['email'],
           token: responseData['idToken'],
         );
+
+        final SharedPreferences prefs = await SharedPreferences.getInstance();
+        prefs.setString('token', responseData['idToken']);
+        prefs.setString('userEmail', responseData['email']);
+        prefs.setString('userId', responseData['localId']);
       } else if (responseData['error']['message'] == 'EMAIL_EXISTS') {
         message = 'This email already exists.';
       } else if (responseData['error']['message'] == 'EMAIL_NOT_FOUND') {
@@ -69,6 +79,17 @@ mixin UserModel on ConnectedProductModel {
       _isLoading = false;
       notifyListeners();
       return {'success': !hasError, 'message': message};
+    }
+  }
+
+  void autoAuthenticate() async {
+    final SharedPreferences prefs = await SharedPreferences.getInstance();
+    final String token = prefs.getString('token');
+    if (token != null) {
+      final String userEmail = prefs.getString('userEmail');
+      final String userId = prefs.getString('userId');
+      _authenticatedUser = User(id: userId, email: userEmail, token: token);
+      notifyListeners();
     }
   }
 }
