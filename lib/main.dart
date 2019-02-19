@@ -40,11 +40,8 @@ class _MyAppState extends State<MyApp> {
           accentColor: Colors.deepOrangeAccent,
         ),
         routes: {
-          '/': (context) => ScopedModelDescendant(
-                builder: (BuildContext context, Widget child, MainModel model) {
-                  return _model.user == null ? Auth() : ProductCardList(_model);
-                },
-              ),
+          '/': (context) =>
+              _model.user == null ? Auth() : ProductCardList(_model),
           '/products': (context) => ProductCardList(_model),
           '/admin': (context) => ProductsAdmin(_model),
         },
