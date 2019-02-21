@@ -21,15 +21,22 @@ class MyApp extends StatefulWidget {
 
 class _MyAppState extends State<MyApp> {
   final MainModel _model = MainModel();
+  bool _isAuthenticated = false;
 
   @override
   void initState() {
     _model.autoAuthenticate();
+    _model.userSubject.listen((bool isAuthenticated) {
+      setState(() {
+        _isAuthenticated = isAuthenticated;
+      });
+    });
     super.initState();
   }
 
   @override
   Widget build(BuildContext context) {
+    print('build main page');
     return ScopedModel<MainModel>(
       model: _model,
       child: MaterialApp(
@@ -40,12 +47,16 @@ class _MyAppState extends State<MyApp> {
           accentColor: Colors.deepOrangeAccent,
         ),
         routes: {
-          '/': (context) =>
-              _model.user == null ? Auth() : ProductCardList(_model),
-          '/products': (context) => ProductCardList(_model),
-          '/admin': (context) => ProductsAdmin(_model),
+          '/': (context) => _isAuthenticated ? ProductCardList(_model) : Auth(),
+          '/admin': (context) =>
+              _isAuthenticated ? ProductsAdmin(_model) : Auth(),
         },
         onGenerateRoute: (RouteSettings settings) {
+          if (!_isAuthenticated) {
+            return MaterialPageRoute<bool>(
+              builder: (context) => Auth(),
+            );
+          }
           final List<String> pathElements = settings.name.split('/');
           if (pathElements[0] != '') {
             return null;
@@ -57,14 +68,16 @@ class _MyAppState extends State<MyApp> {
               return product.id == productId;
             });
             return MaterialPageRoute<bool>(
-              builder: (context) => ProductDetail(product),
+              builder: (context) =>
+                  _isAuthenticated ? ProductDetail(product) : Auth(),
             );
           }
           return null;
         },
         onUnknownRoute: (RouteSettings settings) {
           return MaterialPageRoute(
-            builder: (context) => ProductCardList(_model),
+            builder: (context) =>
+                _isAuthenticated ? ProductCardList(_model) : Auth(),
           );
         },
       ),
