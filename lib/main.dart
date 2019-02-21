@@ -36,7 +36,6 @@ class _MyAppState extends State<MyApp> {
 
   @override
   Widget build(BuildContext context) {
-    print('build main page');
     return ScopedModel<MainModel>(
       model: _model,
       child: MaterialApp(
