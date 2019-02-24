@@ -29,26 +29,28 @@ class _LocationInputState extends State<LocationInput> {
   }
 
   void getStaticMap(String address) async {
-//    if (address.isEmpty) return;
-//    final Uri uri = Uri.https(
-//      'maps.googleapis.com',
-//      '/maps/api/geocode/json',
-//      {'address': address, 'key': 'AIzaSyAC5pmc85_60IolYZ'},
-//    );
-//    final http.Response response = await http.get(uri);
-//    final decodedResponse = json.decode(response.body);
-//
-//    final StaticMapProvider staticMapProvider =
-//        StaticMapProvider('AIzaSyAC5pmc85_60IolYZ-czqGx-rD4CkEdUbg');
-//    final Uri staticMapUri = staticMapProvider.getStaticUriWithMarkers(
-//        [Marker('position', 'Position', 25.0330155, 121.5638707)],
-//        center: Location(25.0330155, 121.5638707),
-//        width: 500,
-//        height: 300,
-//        maptype: StaticMapViewType.roadmap);
-//    setState(() {
-//      _staticMapUri = staticMapUri;
-//    });
+    if (address.isEmpty) return;
+    final Uri uri = Uri.https(
+      'maps.googleapis.com',
+      '/maps/api/geocode/json',
+      {'address': address, 'key': 'AIzaSyDIdqCWuiE2kogzVNJRET6lNBcXdYkW0Yw'},
+    );
+    final http.Response response = await http.get(uri);
+    final decodedResponse = json.decode(response.body);
+    final formattedAddress = decodedResponse['results'][0]['formatted_address'];
+    final coordinate = decodedResponse['results'][0]['geometry']['location'];
+    final StaticMapProvider staticMapProvider =
+        StaticMapProvider('AIzaSyDIdqCWuiE2kogzVNJRET6lNBcXdYkW0Yw');
+    final Uri staticMapUri = staticMapProvider.getStaticUriWithMarkers(
+        [Marker('position', 'Position', coordinate['lat'], coordinate['lng'])],
+        center: Location(coordinate['lat'], coordinate['lng']),
+        width: 500,
+        height: 300,
+        maptype: StaticMapViewType.roadmap);
+    setState(() {
+      _addressInputController.text = formattedAddress;
+      _staticMapUri = staticMapUri;
+    });
   }
 
   void _updateLocation() {

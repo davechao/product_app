@@ -10,7 +10,7 @@ import 'package:scoped_model/scoped_model.dart';
 import 'package:map_view/map_view.dart';
 
 void main() {
-  MapView.setApiKey('AIzaSyAC5pmc85_60IolYZ-czqGx-rD4CkEdUbg');
+  MapView.setApiKey('AIzaSyDIdqCWuiE2kogzVNJRET6lNBcXdYkW0Yw');
   runApp(MyApp());
 }
 

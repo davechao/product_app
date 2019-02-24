@@ -11,7 +11,7 @@
 	<key>CFBundleInfoDictionaryVersion</key>
 	<string>6.0</string>
 	<key>CFBundleName</key>
-	<string>product_app</string>
+	<string>unit_converter_app</string>
 	<key>CFBundlePackageType</key>
 	<string>APPL</string>
 	<key>CFBundleShortVersionString</key>
@@ -27,7 +27,7 @@
 	<key>UIMainStoryboardFile</key>
 	<string>Main</string>
 	<key>UISupportedInterfaceOrientations</key>
-	<key>NSLocationWhenInUseUsageDescription</key>
+    <key>NSLocationWhenInUseUsageDescription</key>
     <string>User location is required to add a product location.</string>
 	<array>
 		<string>UIInterfaceOrientationPortrait</string>
