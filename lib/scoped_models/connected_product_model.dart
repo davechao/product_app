@@ -1,4 +1,5 @@
 import 'package:product_app/models/auth.dart';
+import 'package:product_app/models/location_data.dart';
 import 'package:product_app/models/product.dart';
 import 'package:product_app/models/user.dart';
 import 'package:scoped_model/scoped_model.dart';
@@ -167,8 +168,8 @@ mixin ProductModel on ConnectedProductModel {
     return _showFavorites;
   }
 
-  Future<bool> addProduct(
-      String title, String description, String image, double price) async {
+  Future<bool> addProduct(String title, String description, String image,
+      double price, LocationData locationData) async {
     _isLoading = true;
     notifyListeners();
     final dbUrl =
@@ -181,7 +182,10 @@ mixin ProductModel on ConnectedProductModel {
       'image': imageUrl,
       'price': price,
       'userEmail': _authenticatedUser.email,
-      'userId': _authenticatedUser.id
+      'userId': _authenticatedUser.id,
+      'location_lat': locationData.latitude,
+      'location_lng': locationData.longitude,
+      'location_address': locationData.address
     };
     final requestData = json.encode(productData);
     try {
@@ -198,6 +202,7 @@ mixin ProductModel on ConnectedProductModel {
         description: description,
         image: image,
         price: price,
+        location: locationData,
         userEmail: _authenticatedUser.email,
         userId: _authenticatedUser.id,
       );
@@ -212,8 +217,8 @@ mixin ProductModel on ConnectedProductModel {
     }
   }
 
-  Future<bool> updateProduct(
-      String title, String description, String image, double price) async {
+  Future<bool> updateProduct(String title, String description, String image,
+      double price, LocationData locationData) async {
     _isLoading = true;
     notifyListeners();
     final dbUrl =
@@ -226,7 +231,10 @@ mixin ProductModel on ConnectedProductModel {
       'image': imageUrl,
       'price': price,
       'userEmail': selectedProduct.userEmail,
-      'userId': selectedProduct.userId
+      'userId': selectedProduct.userId,
+      'location_lat': locationData.latitude,
+      'location_lng': locationData.longitude,
+      'location_address': locationData.address
     };
     final requestData = json.encode(updateData);
     try {
@@ -237,6 +245,7 @@ mixin ProductModel on ConnectedProductModel {
         description: description,
         image: image,
         price: price,
+        location: locationData,
         userEmail: selectedProduct.userEmail,
         userId: selectedProduct.userId,
       );
@@ -291,6 +300,11 @@ mixin ProductModel on ConnectedProductModel {
             description: productData['description'],
             image: productData['image'],
             price: productData['price'],
+            location: LocationData(
+              address: productData['location_address'],
+              latitude: productData['location_lat'],
+              longitude: productData['location_lng'],
+            ),
             userEmail: productData['userEmail'],
             userId: productData['userId'],
             isFavorite: productData['wishlistUsers'] == null
@@ -322,6 +336,7 @@ mixin ProductModel on ConnectedProductModel {
       description: selectedProduct.description,
       price: selectedProduct.price,
       image: selectedProduct.image,
+      location: selectedProduct.location,
       userEmail: selectedProduct.userEmail,
       userId: selectedProduct.userId,
       isFavorite: newFavoriteStatus,
@@ -344,6 +359,7 @@ mixin ProductModel on ConnectedProductModel {
         description: selectedProduct.description,
         price: selectedProduct.price,
         image: selectedProduct.image,
+        location: selectedProduct.location,
         userEmail: selectedProduct.userEmail,
         userId: selectedProduct.userId,
         isFavorite: !newFavoriteStatus,
@@ -355,7 +371,7 @@ mixin ProductModel on ConnectedProductModel {
 
   void selectProduct(String productId) {
     _selProductId = productId;
-    if (_selProductId != null) {
+    if (productId != null) {
       notifyListeners();
     }
   }
