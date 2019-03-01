@@ -28,6 +28,7 @@ class _ProductEditState extends State<ProductEdit> {
   final _descriptionFocusNode = FocusNode();
   final _priceFocusNode = FocusNode();
   final _titleTextController = TextEditingController();
+  final _descriptionTextController = TextEditingController();
 
   Widget _buildTitleTextField(Product product) {
     if (product == null && _titleTextController.text.trim() == '') {
@@ -60,13 +61,19 @@ class _ProductEditState extends State<ProductEdit> {
   }
 
   Widget _buildDescriptionTextField(Product product) {
+    if (product == null && _descriptionTextController.text.trim() == '') {
+      _descriptionTextController.text = '';
+    } else if (product != null &&
+        _descriptionTextController.text.trim() == '') {
+      _descriptionTextController.text = product.description;
+    }
     return EnsureVisibleWhenFocused(
       focusNode: _descriptionFocusNode,
       child: TextFormField(
         maxLines: 4,
         focusNode: _descriptionFocusNode,
         decoration: InputDecoration(labelText: 'Product Description'),
-        initialValue: product == null ? '' : product.description,
+        controller: _descriptionTextController,
         validator: (String value) {
           if (value.isEmpty || value.length < 10) {
             return 'Description is required and should be 10+ characters long.';
@@ -163,7 +170,7 @@ class _ProductEditState extends State<ProductEdit> {
     if (selectedProductIndex == -1) {
       addProduct(
         _titleTextController.text,
-        _formData['description'],
+        _descriptionTextController.text,
         _formData['image'],
         _formData['price'],
         _formData['location'],
@@ -192,7 +199,7 @@ class _ProductEditState extends State<ProductEdit> {
     } else {
       updateProduct(
         _titleTextController.text,
-        _formData['description'],
+        _descriptionTextController.text,
         _formData['image'],
         _formData['price'],
         _formData['location'],

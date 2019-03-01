@@ -26,6 +26,12 @@
 	<string>LaunchScreen</string>
 	<key>NSLocationWhenInUseUsageDescription</key>
     <string>User location is required to add a product location.</string>
+    <key>NSPhotoLibraryUsageDescription</key>
+    <string>Image is used as a product image.</string>
+    <key>NSCameraUsageDescription</key>
+    <string>Image is used as a product image.</string>
+    <key>NSMicrophoneUsageDescription</key>
+    <string>Image is used as a product image.</string>
 	<key>UIMainStoryboardFile</key>
 	<string>Main</string>
 	<key>UISupportedInterfaceOrientations</key>
