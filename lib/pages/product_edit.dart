@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:product_app/models/location_data.dart';
 import 'package:product_app/models/product.dart';
@@ -19,7 +21,7 @@ class _ProductEditState extends State<ProductEdit> {
     'title': null,
     'description': null,
     'price': null,
-    'image': 'assets/food.jpg',
+    'image': null,
     'location': null
   };
 
@@ -149,7 +151,7 @@ class _ProductEditState extends State<ProductEdit> {
               SizedBox(height: 10.0),
               LocationInput(_setLocation, product),
               SizedBox(height: 10.0),
-              ImageInput(),
+              ImageInput(_setImage, product),
               SizedBox(height: 10.0),
               _buildSubmitButton(),
             ],
@@ -163,9 +165,14 @@ class _ProductEditState extends State<ProductEdit> {
     _formData['location'] = locationData;
   }
 
+  void _setImage(File image) {
+    _formData['image'] = image;
+  }
+
   void _submitForm(Function addProduct, Function updateProduct,
       Function selectProduct, int selectedProductIndex) {
-    if (!_formKey.currentState.validate()) return;
+    if (!_formKey.currentState.validate() ||
+        (_formData['image'] == null && selectedProductIndex == -1)) return;
     _formKey.currentState.save();
     if (selectedProductIndex == -1) {
       addProduct(
