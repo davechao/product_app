@@ -1,3 +1,6 @@
+import 'dart:io';
+
+import 'package:http_parser/http_parser.dart';
 import 'package:product_app/models/auth.dart';
 import 'package:product_app/models/location_data.dart';
 import 'package:product_app/models/product.dart';
@@ -5,6 +8,8 @@ import 'package:product_app/models/user.dart';
 import 'package:scoped_model/scoped_model.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:rxdart/rxdart.dart';
+import 'package:mime/mime.dart';
+
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 import 'dart:async';
@@ -168,21 +173,55 @@ mixin ProductModel on ConnectedProductModel {
     return _showFavorites;
   }
 
-  Future<bool> addProduct(String title, String description, String image,
+  Future<Map<String, dynamic>> uploadImage(File image,
+      {String imagePath}) async {
+    final storeImageUri =
+        'https://us-central1-flutter-products-b83d5.cloudfunctions.net/storeImage';
+    final mimeTypeData = lookupMimeType(image.path).split('/');
+    final imageUploadRequest =
+        http.MultipartRequest('POST', Uri.parse(storeImageUri));
+    final file = await http.MultipartFile.fromPath(
+      'image',
+      image.path,
+      contentType: MediaType(
+        mimeTypeData[0],
+        mimeTypeData[1],
+      ),
+    );
+    imageUploadRequest.files.add(file);
+    if (imagePath != null) {
+      imageUploadRequest.fields['imagePath'] = Uri.encodeComponent(imagePath);
+    }
+    imageUploadRequest.headers['Authorization'] =
+        'Bearer ${_authenticatedUser.token}';
+
+    try {
+      final streamedResponse = await imageUploadRequest.send();
+      final response = await http.Response.fromStream(streamedResponse);
+      if (response.statusCode != 200 && response.statusCode != 201) return null;
+      final responseData = json.decode(response.body);
+      return responseData;
+    } catch (error) {
+      return null;
+    }
+  }
+
+  Future<bool> addProduct(String title, String description, File image,
       double price, LocationData locationData) async {
     _isLoading = true;
     notifyListeners();
+    final uploadData = await uploadImage(image);
+    if (uploadData == null) return false;
     final dbUrl =
         'https://flutter-products-b83d5.firebaseio.com/products.json?auth=${_authenticatedUser.token}';
-    final imageUrl =
-        'https://cdn.pixabay.com/photo/2015/10/02/12/00/chocolate-968457_960_720.jpg';
     final Map<String, dynamic> productData = {
       'title': title,
       'description': description,
-      'image': imageUrl,
       'price': price,
       'userEmail': _authenticatedUser.email,
       'userId': _authenticatedUser.id,
+      'imagePath': uploadData['imagePath'],
+      'imageUrl': uploadData['imageUrl'],
       'location_lat': locationData.latitude,
       'location_lng': locationData.longitude,
       'location_address': locationData.address
@@ -200,7 +239,8 @@ mixin ProductModel on ConnectedProductModel {
         id: responseData['name'],
         title: title,
         description: description,
-        image: image,
+        image: uploadData['imageUrl'],
+        imagePath: uploadData['imagePath'],
         price: price,
         location: locationData,
         userEmail: _authenticatedUser.email,
@@ -298,7 +338,8 @@ mixin ProductModel on ConnectedProductModel {
             id: productId,
             title: productData['title'],
             description: productData['description'],
-            image: productData['image'],
+            image: productData['imageUrl'],
+            imagePath: productData['imagePath'],
             price: productData['price'],
             location: LocationData(
               address: productData['location_address'],
@@ -336,6 +377,7 @@ mixin ProductModel on ConnectedProductModel {
       description: selectedProduct.description,
       price: selectedProduct.price,
       image: selectedProduct.image,
+      imagePath: selectedProduct.imagePath,
       location: selectedProduct.location,
       userEmail: selectedProduct.userEmail,
       userId: selectedProduct.userId,
@@ -359,6 +401,7 @@ mixin ProductModel on ConnectedProductModel {
         description: selectedProduct.description,
         price: selectedProduct.price,
         image: selectedProduct.image,
+        imagePath: selectedProduct.imagePath,
         location: selectedProduct.location,
         userEmail: selectedProduct.userEmail,
         userId: selectedProduct.userId,
