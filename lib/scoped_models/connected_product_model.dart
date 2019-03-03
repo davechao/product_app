@@ -257,40 +257,47 @@ mixin ProductModel on ConnectedProductModel {
     }
   }
 
-  Future<bool> updateProduct(String title, String description, String image,
+  Future<bool> updateProduct(String title, String description, File image,
       double price, LocationData locationData) async {
     _isLoading = true;
     notifyListeners();
+    String imagePath = selectedProduct.imagePath;
+    String imageUrl = selectedProduct.image;
+    if (image != null) {
+      final uploadData = await uploadImage(image);
+      if (uploadData == null) return false;
+      imagePath = uploadData['imagePath'];
+      imageUrl = uploadData['imageUrl'];
+    }
     final dbUrl =
         "https://flutter-products-b83d5.firebaseio.com/products/${selectedProduct.id}.json?auth=${_authenticatedUser.token}";
-    final imageUrl =
-        'https://cdn.pixabay.com/photo/2015/10/02/12/00/chocolate-968457_960_720.jpg';
     final Map<String, dynamic> updateData = {
       'title': title,
       'description': description,
-      'image': imageUrl,
       'price': price,
       'userEmail': selectedProduct.userEmail,
       'userId': selectedProduct.userId,
+      'imagePath': imagePath,
+      'imageUrl': imageUrl,
       'location_lat': locationData.latitude,
       'location_lng': locationData.longitude,
       'location_address': locationData.address
     };
-    final requestData = json.encode(updateData);
     try {
-      await http.put(dbUrl, body: requestData);
+      final requestData = json.encode(updateData);
+      final http.Response response = await http.put(dbUrl, body: requestData);
       final Product updatedProduct = Product(
         id: selectedProduct.id,
         title: title,
         description: description,
-        image: image,
+        image: imageUrl,
+        imagePath: imagePath,
         price: price,
         location: locationData,
         userEmail: selectedProduct.userEmail,
         userId: selectedProduct.userId,
       );
       _products[selectedProductIndex] = updatedProduct;
-      _isLoading = false;
       notifyListeners();
       return true;
     } catch (error) {
