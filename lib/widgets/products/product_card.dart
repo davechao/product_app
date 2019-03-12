@@ -8,9 +8,8 @@ import 'package:scoped_model/scoped_model.dart';
 
 class ProductCard extends StatelessWidget {
   final Product product;
-  final int productIndex;
 
-  ProductCard(this.product, this.productIndex);
+  ProductCard(this.product);
 
   Widget _buildTitlePriceRow() {
     return Container(
@@ -18,11 +17,9 @@ class ProductCard extends StatelessWidget {
       child: Row(
         mainAxisAlignment: MainAxisAlignment.center,
         children: <Widget>[
-          TitleDefault(product.title),
-          SizedBox(
-            width: 8.0,
-          ),
-          PriceTag(product.price.toString()),
+          Flexible(child: TitleDefault(product.title)),
+          Flexible(child: SizedBox(width: 8.0)),
+          Flexible(child: PriceTag(product.price.toString())),
         ],
       ),
     );
@@ -38,21 +35,19 @@ class ProductCard extends StatelessWidget {
             icon: Icon(Icons.info),
             color: Colors.blue,
             onPressed: () {
-              model.selectProduct(model.allProducts[productIndex].id);
+              model.selectProduct(product.id);
               Navigator.pushNamed<bool>(
                 context,
-                '/product/' + model.allProducts[productIndex].id,
+                '/product/' + product.id,
               ).then((_) => model.selectProduct(null));
             },
           ),
           IconButton(
-            icon: Icon(model.allProducts[productIndex].isFavorite
-                ? Icons.favorite
-                : Icons.favorite_border),
+            icon: Icon(
+                product.isFavorite ? Icons.favorite : Icons.favorite_border),
             color: Colors.red,
             onPressed: () {
-              model.selectProduct(model.allProducts[productIndex].id);
-              model.toggleProductFavoriteStatus();
+              model.toggleProductFavoriteStatus(product);
             },
           ),
         ],

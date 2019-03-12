@@ -115,9 +115,8 @@ class _LocationInputState extends State<LocationInput> {
 
   void _getUserLocation() async {
     final location = geoloc.Location();
-    var currentLocation;
     try {
-      currentLocation = await location.getLocation();
+      final currentLocation = await location.getLocation();
       final address = await _getAddress(
           currentLocation.latitude, currentLocation.longitude);
       _getStaticMap(
@@ -126,8 +125,22 @@ class _LocationInputState extends State<LocationInput> {
         lat: currentLocation.latitude,
         lng: currentLocation.longitude,
       );
-    } on Exception {
-      currentLocation = null;
+    } catch (error) {
+      showDialog(
+        context: context,
+        builder: (BuildContext context) {
+          return AlertDialog(
+            title: Text('Could not fetch location'),
+            content: Text('Please add an address manually!'),
+            actions: <Widget>[
+              FlatButton(
+                child: Text('Okay'),
+                onPressed: () => Navigator.pop(context),
+              ),
+            ],
+          );
+        },
+      );
     }
   }
 

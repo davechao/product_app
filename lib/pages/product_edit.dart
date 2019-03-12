@@ -31,6 +31,7 @@ class _ProductEditState extends State<ProductEdit> {
   final _priceFocusNode = FocusNode();
   final _titleTextController = TextEditingController();
   final _descriptionTextController = TextEditingController();
+  final _priceTextController = TextEditingController();
 
   Widget _buildTitleTextField(Product product) {
     if (product == null && _titleTextController.text.trim() == '') {
@@ -89,13 +90,18 @@ class _ProductEditState extends State<ProductEdit> {
   }
 
   Widget _buildPriceTextField(Product product) {
+    if (product == null && _priceTextController.text.trim() == '') {
+      _priceTextController.text = '';
+    } else if (product != null && _priceTextController.text.trim() == '') {
+      _priceTextController.text = product.price.toString();
+    }
     return EnsureVisibleWhenFocused(
       focusNode: _priceFocusNode,
       child: TextFormField(
         focusNode: _priceFocusNode,
         keyboardType: TextInputType.number,
         decoration: InputDecoration(labelText: 'Product Price'),
-        initialValue: product == null ? '' : product.price.toString(),
+        controller: _priceTextController,
         validator: (String value) {
           if (value.isEmpty ||
               !RegExp(r'^(?:[1-9]\d*|0)?(?:\.\d+)?$').hasMatch(value)) {
@@ -179,7 +185,7 @@ class _ProductEditState extends State<ProductEdit> {
         _titleTextController.text,
         _descriptionTextController.text,
         _formData['image'],
-        _formData['price'],
+        double.parse(_priceTextController.text),
         _formData['location'],
       ).then((bool success) {
         if (success) {
@@ -208,7 +214,7 @@ class _ProductEditState extends State<ProductEdit> {
         _titleTextController.text,
         _descriptionTextController.text,
         _formData['image'],
-        _formData['price'],
+        double.parse(_priceTextController.text),
         _formData['location'],
       ).then((bool success) {
         if (success) {
