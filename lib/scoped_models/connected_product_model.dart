@@ -79,7 +79,7 @@ mixin UserModel on ConnectedProductModel {
         _userSubject.add(true);
         final DateTime now = DateTime.now();
         final DateTime expiryTime =
-        now.add(Duration(seconds: int.parse(responseData['expiresIn'])));
+            now.add(Duration(seconds: int.parse(responseData['expiresIn'])));
         final SharedPreferences prefs = await SharedPreferences.getInstance();
         prefs.setString('token', responseData['idToken']);
         prefs.setString('userEmail', responseData['email']);
@@ -116,9 +116,7 @@ mixin UserModel on ConnectedProductModel {
       }
       final String userEmail = prefs.getString('userEmail');
       final String userId = prefs.getString('userId');
-      final int tokenLifespan = parsedExpiryTime
-          .difference(now)
-          .inSeconds;
+      final int tokenLifespan = parsedExpiryTime.difference(now).inSeconds;
       _authenticatedUser = User(id: userId, email: userEmail, token: token);
       _userSubject.add(true);
       setAuthTimeout(tokenLifespan);
@@ -182,7 +180,7 @@ mixin ProductModel on ConnectedProductModel {
         'https://us-central1-flutter-products-b83d5.cloudfunctions.net/storeImage';
     final mimeTypeData = lookupMimeType(image.path).split('/');
     final imageUploadRequest =
-    http.MultipartRequest('POST', Uri.parse(storeImageUri));
+        http.MultipartRequest('POST', Uri.parse(storeImageUri));
     final file = await http.MultipartFile.fromPath(
       'image',
       image.path,
@@ -196,7 +194,7 @@ mixin ProductModel on ConnectedProductModel {
       imageUploadRequest.fields['imagePath'] = Uri.encodeComponent(imagePath);
     }
     imageUploadRequest.headers['Authorization'] =
-    'Bearer ${_authenticatedUser.token}';
+        'Bearer ${_authenticatedUser.token}';
 
     try {
       final streamedResponse = await imageUploadRequest.send();
@@ -216,8 +214,7 @@ mixin ProductModel on ConnectedProductModel {
     final uploadData = await uploadImage(image);
     if (uploadData == null) return false;
     final dbUrl =
-        'https://flutter-products-b83d5.firebaseio.com/products.json?auth=${_authenticatedUser
-        .token}';
+        'https://flutter-products-b83d5.firebaseio.com/products.json?auth=${_authenticatedUser.token}';
     final Map<String, dynamic> productData = {
       'title': title,
       'description': description,
@@ -274,8 +271,7 @@ mixin ProductModel on ConnectedProductModel {
       imageUrl = uploadData['imageUrl'];
     }
     final dbUrl =
-        "https://flutter-products-b83d5.firebaseio.com/products/${selectedProduct
-        .id}.json?auth=${_authenticatedUser.token}";
+        "https://flutter-products-b83d5.firebaseio.com/products/${selectedProduct.id}.json?auth=${_authenticatedUser.token}";
     final Map<String, dynamic> updateData = {
       'title': title,
       'description': description,
@@ -319,8 +315,7 @@ mixin ProductModel on ConnectedProductModel {
     _selProductId = null;
     notifyListeners();
     final dbUrl =
-        "https://flutter-products-b83d5.firebaseio.com/products/$deletedProductId.json?auth=${_authenticatedUser
-        .token}";
+        "https://flutter-products-b83d5.firebaseio.com/products/$deletedProductId.json?auth=${_authenticatedUser.token}";
     try {
       await http.delete(dbUrl);
       _isLoading = false;
@@ -333,13 +328,15 @@ mixin ProductModel on ConnectedProductModel {
     }
   }
 
-  Future<Null> fetchProducts({onlyForUser = false}) async {
+  Future<Null> fetchProducts(
+      {onlyForUser = false, clearExisting = false}) async {
     _isLoading = true;
-    _products = [];
+    if (clearExisting) {
+      _products = [];
+    }
     notifyListeners();
     final dbUrl =
-        'https://flutter-products-b83d5.firebaseio.com/products.json?auth=${_authenticatedUser
-        .token}';
+        'https://flutter-products-b83d5.firebaseio.com/products.json?auth=${_authenticatedUser.token}';
     try {
       final http.Response response = await http.get(dbUrl);
       final List<Product> fetchedProductList = [];
@@ -366,13 +363,13 @@ mixin ProductModel on ConnectedProductModel {
             isFavorite: productData['wishlistUsers'] == null
                 ? false
                 : (productData['wishlistUsers'] as Map<String, dynamic>)
-                .containsKey(_authenticatedUser.id));
+                    .containsKey(_authenticatedUser.id));
         fetchedProductList.add(product);
       });
       _products = onlyForUser
           ? fetchedProductList.where((Product product) {
-        return product.userId == _authenticatedUser.id;
-      }).toList()
+              return product.userId == _authenticatedUser.id;
+            }).toList()
           : fetchedProductList;
       _isLoading = false;
       notifyListeners();
@@ -404,9 +401,7 @@ mixin ProductModel on ConnectedProductModel {
     _products[toggledProductIndex] = updateProduct;
     notifyListeners();
     final dbUrl =
-        'https://flutter-products-b83d5.firebaseio.com/products/${selectedProduct
-        .id}/wishlistUsers/${_authenticatedUser
-        .id}.json?auth=${_authenticatedUser.token}';
+        'https://flutter-products-b83d5.firebaseio.com/products/${selectedProduct.id}/wishlistUsers/${_authenticatedUser.id}.json?auth=${_authenticatedUser.token}';
     final requestData = json.encode(true);
     http.Response response;
     if (newFavoriteStatus) {
