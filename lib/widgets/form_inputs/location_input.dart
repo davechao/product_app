@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:map_view/map_view.dart';
 import 'package:product_app/models/location_data.dart';
 import 'package:product_app/models/product.dart';
+import 'package:product_app/shared/global_config.dart';
 import 'package:product_app/widgets/helpers/ensure_visible.dart';
 
 import 'package:http/http.dart' as http;
@@ -54,7 +55,7 @@ class _LocationInputState extends State<LocationInput> {
       final Uri uri = Uri.https(
         'maps.googleapis.com',
         '/maps/api/geocode/json',
-        {'address': address, 'key': 'AIzaSyDIdqCWuiE2kogzVNJRET6lNBcXdYkW0Yw'},
+        {'address': address, 'key': apiKey},
       );
       final http.Response response = await http.get(uri);
       final decodedResponse = json.decode(response.body);
@@ -73,8 +74,7 @@ class _LocationInputState extends State<LocationInput> {
           LocationData(address: address, latitude: lat, longitude: lng);
     }
     if (mounted) {
-      final StaticMapProvider staticMapProvider =
-          StaticMapProvider('AIzaSyDIdqCWuiE2kogzVNJRET6lNBcXdYkW0Yw');
+      final StaticMapProvider staticMapProvider = StaticMapProvider(apiKey);
       final Uri staticMapUri = staticMapProvider.getStaticUriWithMarkers(
         [
           Marker(
@@ -102,10 +102,7 @@ class _LocationInputState extends State<LocationInput> {
     final Uri uri = Uri.https(
       'maps.googleapis.com',
       '/maps/api/geocode/json',
-      {
-        'latlng': '${lat.toString()},${lng.toString()}',
-        'key': 'AIzaSyDIdqCWuiE2kogzVNJRET6lNBcXdYkW0Yw'
-      },
+      {'latlng': '${lat.toString()},${lng.toString()}', 'key': apiKey},
     );
     final http.Response response = await http.get(uri);
     final decodedResponse = json.decode(response.body);

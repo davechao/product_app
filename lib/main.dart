@@ -5,12 +5,13 @@ import 'package:product_app/pages/product_detail.dart';
 import 'package:product_app/pages/product_card_list.dart';
 import 'package:product_app/pages/products_admin.dart';
 import 'package:product_app/scoped_models/main_model.dart';
+import 'package:product_app/shared/global_config.dart';
 import 'package:product_app/widgets/helpers/custom_route.dart';
 import 'package:scoped_model/scoped_model.dart';
 import 'package:map_view/map_view.dart';
 
 void main() {
-  MapView.setApiKey('AIzaSyDIdqCWuiE2kogzVNJRET6lNBcXdYkW0Yw');
+  MapView.setApiKey(apiKey);
   runApp(MyApp());
 }
 
