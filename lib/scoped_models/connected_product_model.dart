@@ -381,27 +381,27 @@ mixin ProductModel on ConnectedProductModel {
   }
 
   void toggleProductFavoriteStatus(Product toggledProduct) async {
-    final bool isCurrentlyFavorite = selectedProduct.isFavorite;
+    final bool isCurrentlyFavorite = toggledProduct.isFavorite;
     final bool newFavoriteStatus = !isCurrentlyFavorite;
     final int toggledProductIndex = _products.indexWhere((Product product) {
       return product.id == toggledProduct.id;
     });
     final Product updateProduct = Product(
-      id: selectedProduct.id,
-      title: selectedProduct.title,
-      description: selectedProduct.description,
-      price: selectedProduct.price,
-      image: selectedProduct.image,
-      imagePath: selectedProduct.imagePath,
-      location: selectedProduct.location,
-      userEmail: selectedProduct.userEmail,
-      userId: selectedProduct.userId,
+      id: toggledProduct.id,
+      title: toggledProduct.title,
+      description: toggledProduct.description,
+      price: toggledProduct.price,
+      image: toggledProduct.image,
+      imagePath: toggledProduct.imagePath,
+      location: toggledProduct.location,
+      userEmail: toggledProduct.userEmail,
+      userId: toggledProduct.userId,
       isFavorite: newFavoriteStatus,
     );
     _products[toggledProductIndex] = updateProduct;
     notifyListeners();
     final dbUrl =
-        'https://flutter-products-b83d5.firebaseio.com/products/${selectedProduct.id}/wishlistUsers/${_authenticatedUser.id}.json?auth=${_authenticatedUser.token}';
+        'https://flutter-products-b83d5.firebaseio.com/products/${toggledProduct.id}/wishlistUsers/${_authenticatedUser.id}.json?auth=${_authenticatedUser.token}';
     final requestData = json.encode(true);
     http.Response response;
     if (newFavoriteStatus) {
@@ -411,15 +411,15 @@ mixin ProductModel on ConnectedProductModel {
     }
     if (response.statusCode != 200 && response.statusCode != 201) {
       final Product updateProduct = Product(
-        id: selectedProduct.id,
-        title: selectedProduct.title,
-        description: selectedProduct.description,
-        price: selectedProduct.price,
-        image: selectedProduct.image,
-        imagePath: selectedProduct.imagePath,
-        location: selectedProduct.location,
-        userEmail: selectedProduct.userEmail,
-        userId: selectedProduct.userId,
+        id: toggledProduct.id,
+        title: toggledProduct.title,
+        description: toggledProduct.description,
+        price: toggledProduct.price,
+        image: toggledProduct.image,
+        imagePath: toggledProduct.imagePath,
+        location: toggledProduct.location,
+        userEmail: toggledProduct.userEmail,
+        userId: toggledProduct.userId,
         isFavorite: !newFavoriteStatus,
       );
       _products[toggledProductIndex] = updateProduct;

@@ -104,13 +104,9 @@ class _ProductEditState extends State<ProductEdit> {
         controller: _priceTextController,
         validator: (String value) {
           if (value.isEmpty ||
-              !RegExp(r'^(?:[1-9]\d*|0)?(?:\.\d+)?$').hasMatch(value)) {
+              !RegExp(r'^(?:[1-9]\d*|0)?(?:[.,]\d+)?$').hasMatch(value)) {
             return 'Price is required and should be a number.';
           }
-        },
-        onSaved: (String value) {
-          _formData['price'] =
-              double.parse(value.replaceFirst(RegExp(r','), '.'));
         },
       ),
     );
@@ -185,7 +181,7 @@ class _ProductEditState extends State<ProductEdit> {
         _titleTextController.text,
         _descriptionTextController.text,
         _formData['image'],
-        double.parse(_priceTextController.text),
+        double.parse(_priceTextController.text.replaceFirst(RegExp(r','), '.')),
         _formData['location'],
       ).then((bool success) {
         if (success) {
@@ -214,7 +210,7 @@ class _ProductEditState extends State<ProductEdit> {
         _titleTextController.text,
         _descriptionTextController.text,
         _formData['image'],
-        double.parse(_priceTextController.text),
+        double.parse(_priceTextController.text.replaceFirst(RegExp(r','), '.')),
         _formData['location'],
       ).then((bool success) {
         if (success) {
