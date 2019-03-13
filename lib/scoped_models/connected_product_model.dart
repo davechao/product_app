@@ -286,7 +286,7 @@ mixin ProductModel on ConnectedProductModel {
     };
     try {
       final requestData = json.encode(updateData);
-      final http.Response response = await http.put(dbUrl, body: requestData);
+      await http.put(dbUrl, body: requestData);
       final Product updatedProduct = Product(
         id: selectedProduct.id,
         title: title,
