@@ -5,6 +5,7 @@ import 'package:product_app/pages/product_detail.dart';
 import 'package:product_app/pages/product_card_list.dart';
 import 'package:product_app/pages/products_admin.dart';
 import 'package:product_app/scoped_models/main_model.dart';
+import 'package:product_app/shared/adaptive_theme.dart';
 import 'package:product_app/shared/global_config.dart';
 import 'package:product_app/widgets/helpers/custom_route.dart';
 import 'package:scoped_model/scoped_model.dart';
@@ -43,11 +44,7 @@ class _MyAppState extends State<MyApp> {
       model: _model,
       child: MaterialApp(
         debugShowCheckedModeBanner: false,
-        theme: ThemeData(
-//          brightness: Brightness.light,
-          primarySwatch: Colors.deepOrange,
-          accentColor: Colors.deepOrangeAccent,
-        ),
+        theme: getAdaptiveTheme(context),
         routes: {
           '/': (context) => _isAuthenticated ? ProductCardList(_model) : Auth(),
           '/admin': (context) =>

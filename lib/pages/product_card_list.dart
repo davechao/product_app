@@ -23,6 +23,8 @@ class _ProductCardListState extends State<ProductCardList> {
           AppBar(
             automaticallyImplyLeading: false,
             title: Text('Choose'),
+            elevation:
+                Theme.of(context).platform == TargetPlatform.iOS ? 0.0 : 4.0,
           ),
           ListTile(
             leading: Icon(Icons.edit),
@@ -82,6 +84,7 @@ class _ProductCardListState extends State<ProductCardList> {
       drawer: _buildSideDrawer(context),
       appBar: AppBar(
         title: Text("Products"),
+        elevation: Theme.of(context).platform == TargetPlatform.iOS ? 0.0 : 4.0,
         actions: <Widget>[
           _buildFavoriteIconButton(),
         ],

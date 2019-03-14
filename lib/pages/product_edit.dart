@@ -1,5 +1,6 @@
 import 'dart:io';
 
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:product_app/models/location_data.dart';
 import 'package:product_app/models/product.dart';
@@ -7,6 +8,7 @@ import 'package:product_app/scoped_models/main_model.dart';
 import 'package:product_app/widgets/form_inputs/image_input.dart';
 import 'package:product_app/widgets/form_inputs/location_input.dart';
 import 'package:product_app/widgets/helpers/ensure_visible.dart';
+import 'package:product_app/widgets/ui_elements/adapative_progress_indicator.dart';
 import 'package:scoped_model/scoped_model.dart';
 
 class ProductEdit extends StatefulWidget {
@@ -116,7 +118,7 @@ class _ProductEditState extends State<ProductEdit> {
     return ScopedModelDescendant<MainModel>(
       builder: (BuildContext context, Widget child, MainModel model) {
         return model.isLoading
-            ? Center(child: CircularProgressIndicator())
+            ? Center(child: AdapativeProgressIndicator())
             : RaisedButton(
                 child: Text('Save'),
                 color: Colors.deepOrange,
@@ -246,7 +248,12 @@ class _ProductEditState extends State<ProductEdit> {
         return model.selectedProductIndex == -1
             ? pageContent
             : Scaffold(
-                appBar: AppBar(title: Text('Edit Product')),
+                appBar: AppBar(
+                  title: Text('Edit Product'),
+                  elevation: Theme.of(context).platform == TargetPlatform.iOS
+                      ? 0.0
+                      : 4.0,
+                ),
                 body: pageContent,
               );
       },
